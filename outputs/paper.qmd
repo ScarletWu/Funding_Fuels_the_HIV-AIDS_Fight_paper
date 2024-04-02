@@ -1,0 +1,38 @@
+---
+title: "Evidence and Lessons from Public Health Funding's Impact on HIV/AIDS"
+author: Ruoxian Wu
+thanks: "Code and data are available at: https://github.com/ScarletWu/Funding_Fuels_the_HIV-AIDS_Fight.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/1783/"
+date: "April 2, 2024"
+date-format: long
+abstract: "This paper replicates and critically examines the study conducted by Marcus Dillender (2023) on the impact of the Ryan White CARE Act's Title I funding on HIV/AIDS outcomes. My replication focuses on the study's methodology, data integrity, and the robustness of its conclusions, particularly in the context of diagnosis and prevalence data. I assess the original findings through a reanalysis of public data sources and discuss the implications of our results for public health policy and future research directions."
+format: pdf
+toc: true
+number-sections: true
+bibliography: references.bib
+---
+
+
+# Introduction
+
+Public health funding plays a crucial role in optimizing public health outcomes. To understand the impact of federal funding on HIV/AIDS healthcare, Marcus Dillender's paper "Evidence and Lessons on the Health Impacts of Public Health Funding from the Fight against HIV/AIDS" (2023) assesses the efficacy of Title I funding of the Ryan White Comprehensive AIDS Resources Emergency (CARE) Act [@Dillender2023]. By examining its impact on HIV/AIDS-related mortality and incidence rates, the paper reveals the impact of public funding. 
+
+In this paper, I aim to replicate Dillender's research using available public data and direct my attention to the non-mortality outcomes of the Ryan White CARE Act's Title I funding. I examine its influence on the diagnosis and prevalence rates of HIV/AIDS. It offers a unique perspective on HIV/AIDS-affected populations and potential public health interventions for enhancing their quality of life. Based on Dillender's methodology, I employ difference-in-differences and regression discontinuity designs to examine the sensitivity of the findings to different analyses. As a result of this reanalysis, the original study's results are validated and a dialogue on how to interpret public health data regarding policy impact assessments is stimulated.
+
+This critical replication explores the complex issues surrounding public health funding. I analyze the interplay of financial inputs, health outcomes, and the socio-economic fabrics they weave into. I hope that this critical replication encourages a more nuanced approach to future research in public health finance and policy-making. Throughout this investigation, I keep an eye on societal, economic, and systemic factors that influence public health and how federal funding operates within that ecosystem.
+
+# Data
+My reproduction used the programming language R [@r], the analysis used the following packages: Haven[@rHaven], Dplyr [@rDplyr], Ggplot2 [@rGgplot2], Readr [@rReadr], Here [@rHere], Janitor [@rJanitor], KableExtra [@rKableExtra], Knitr [@rKnitr], Tidyverse [@rTidyverse].My reproduction seeks to address two findings written in the original paper.
+
+## Source
+The paper used for replication is from American Economic Association, American Economic Review. The replication package is downloaded from Evidence and Lessons on the Health Impacts of Public Health Funding from the Fight against HIV/AIDS, under Additional Materials. 
+
+## Variables
+In progress
+
+# Results
+In progress
+
+# Discussion
+In progress
+
+# Reference
