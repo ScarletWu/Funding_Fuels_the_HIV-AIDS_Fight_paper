@@ -7,7 +7,10 @@ library(lfe)
 library(stargazer)
 library(coefplot)
 library(broom)
+library(lmtest)
+library(sandwich)
 
+# Set file paths
 data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs"
 
@@ -35,30 +38,105 @@ p1a <- ggplot(data, aes(x = tran_inc_normal)) +
 ggsave("/cloud/project/outputs/figures/fig1a.png", plot = p1a, width = 10, height = 8, dpi = 300)
 
 
-# Regression Analysis: Impact of COVID-19 on employment
+# figure 1b
+data <- data %>%
+  mutate(
+    inc_lost = tran_inc_normal - tran_inc_current,
+    ind_inc_lost = ifelse(inc_lost > 0, 1, NA),
+    ind_meals_reduced = as.numeric(ind_meals_reduced),
+    ind_fem_depression_change = as.numeric(ind_fem_depression_change),
+    ind_fem_worried_change = as.numeric(ind_fem_worried_change),
+    ind_fem_tired_change = as.numeric(ind_fem_tired_change),
+    ind_fem_safety_change = as.numeric(ind_fem_safety_change)
+  )
 
-data <- mutate(data,
-               tran_inc_normal = as.numeric(tran_inc_normal),
-               tran_inc_current = as.numeric(tran_inc_current),
-               inc_lost = tran_inc_normal - tran_inc_current,
-               ind_inc_lost = if_else(inc_lost > 0, 1, NA_real_)
+# Function to fit model and get tidy output
+get_model_summary <- function(dependent_var) {
+  model <- lm(as.formula(paste(dependent_var, "~ 1")), data = data)
+  tidy_model <- tidy(model, conf.int = TRUE)
+  tidy_model$term <- dependent_var
+  return(tidy_model)
+}
+
+# Run models for each outcome
+model_summaries <- bind_rows(
+  get_model_summary("ind_inc_lost"),
+  get_model_summary("ind_meals_reduced"),
+  get_model_summary("ind_fem_depression_change"),
+  get_model_summary("ind_fem_worried_change"),
+  get_model_summary("ind_fem_tired_change"),
+  get_model_summary("ind_fem_safety_change")
 )
 
-# Fixed Effects Model
-model <- felm(ind_inc_lost ~ dist_prop_covid_zone | geo_state, data = data)
+y_labels <- c(
+  "ind_inc_lost" = "Lost Income",
+  "ind_meals_reduced" = "Reduced Meals",
+  "ind_fem_depression_change" = "More Depressed",
+  "ind_fem_worried_change" = "More Anxious",
+  "ind_fem_tired_change" = "More Exhausted",
+  "ind_fem_safety_change" = "Less Safe"
+)
 
-# Tidy model and extract coefficients
-tidy_model <- tidy(model, conf.int = TRUE) %>%
-  filter(term == "dist_prop_covid_zone")
-
-# Coefficient plot (Based on felm model results)
-coef_plot <- ggplot(tidy_model, aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high)) +
+coef_plot <- ggplot(model_summaries, aes(x = estimate, y = term, xmin = conf.low, xmax = conf.high)) +
   geom_pointrange() +
-  coord_flip() +
-  theme_minimal() +
-  labs(title = "Coefficient Plot", x = "Term", y = "Estimate")
+  scale_y_discrete(labels = y_labels) +
+  labs(title = "Effect of COVID-19 on Various Outcomes", x = "Percent", y = "") +
+  theme_minimal()
 
-# Fixed Effects Model
+ggsave(paste0(output_path, "/figures/fig1b.png"), plot = coef_plot, width = 10, height = 5, dpi = 300)
 
-ggsave("/cloud/project/outputs/figures/fig1b.png", plot = p1b, width = 10, height = 8, dpi = 300)
 
+# figure 2
+data$final_status <- as_factor(data$final_status)
+
+data2 <- data %>%
+  filter(final_status %in% c("Fully complete", "Partially complete")) %>% 
+  group_by(geo_district) %>%
+  mutate(
+    geo_district = as.factor(geo_district),
+    Containment = ave(ind_covid_zone, geo_district, FUN = mean, na.rm = TRUE),
+    Depression = mean(ind_fem_depression_change, na.rm = TRUE),
+    Exhaustion = mean(ind_fem_tired_change, na.rm = TRUE),
+    Anxiety = mean(ind_fem_worried_change, na.rm = TRUE),
+    Safety = mean(ind_fem_safety_change, na.rm = TRUE),
+    No_Inc = mean(hh_num_inc_reduced, na.rm = TRUE),
+    Reduced_meals = mean(ind_meals_reduced, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+outcome_vars <- c("Depression", "Exhaustion", "Anxiety", "Safety", "No_Inc", "Reduced_meals")
+
+model_results <- list()
+
+for (var in outcome_vars) {
+  model <- lm(as.formula(paste(var, "~ Containment")), data = data)
+  model_results[[var]] <- tidy(model, conf.int = TRUE)
+}
+
+plots <- list()
+for (var in outcome_vars) {
+  # Extract the model summary
+  summary_df <- model_results[[var]]
+  coef_info <- summary_df %>% filter(term == "Containment")
+  beta <- coef_info$estimate
+  se <- coef_info$std.error
+  
+  # Create scatter plot with regression line and annotation
+  p2 <- ggplot(data, aes_string(x = "Containment", y = var)) +
+    geom_point(aes(weight = district_sample_size), alpha = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, color = "blue") +
+    geom_text(aes(label = paste0("Beta: ", round(beta, 3), 
+                                 "\nSE: ", round(se, 3))),
+              x = Inf, y = Inf, hjust = 1.1, vjust = 1.1, size = 3.5) +
+    labs(title = paste("Scatter Plot of", var, "vs. Containment"),
+         x = "Containment", y = var) +
+    theme_minimal() +
+    theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+  
+  plots[[var]] <- p2
+}
+
+for (var in outcome_vars) {
+  filename <- paste0(output_path, "figures/plot_2", tolower(var), ".png")
+  ggsave(filename, plots[[var]], width = 10, height = 6, dpi = 300)
+}
