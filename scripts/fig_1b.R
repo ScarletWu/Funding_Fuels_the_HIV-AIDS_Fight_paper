@@ -5,7 +5,7 @@ library(dplyr)
 library(broom) 
 library(lmtest)
 library(sandwich) 
-
+1
 # Set file paths
 data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs"
