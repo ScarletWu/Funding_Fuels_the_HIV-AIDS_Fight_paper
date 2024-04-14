@@ -1,7 +1,3 @@
-data_path <- "path/to/your/data/"
-covid_gender_data <- read.dta(paste0(data_path, "covid_gender_data.dta"))
-
-# Load libraries
 library(foreign)    # For reading .dta files
 library(ggplot2)    # For graphs
 library(dplyr)      # For data manipulation
@@ -10,11 +6,9 @@ library(stargazer)  # For creating LaTeX/HTML tables
 library(sandwich)   # For robust standard errors
 
 # Set file paths
-data_path <- "path/to/your/data/"
-output_path <- "path/to/your/output/"
+data_path <- "/cloud/project/data/raw_data/"
 
-# Load data
-data <- read.dta(paste0(data_path, "covid_gender_data.dta"))
+data <- read.dta("/cloud/project/data/raw_data/covid_gender_data.dta"))
 
 # Prepare data
 data$geo_state <- as.factor(data$geo_state)

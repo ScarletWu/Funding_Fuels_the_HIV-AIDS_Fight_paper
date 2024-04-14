@@ -12,7 +12,7 @@ library(sandwich)
 
 # Set file paths
 data_path <- "/cloud/project/data/raw_data/"
-output_path <- "/cloud/project/outputs"
+output_path <- "/cloud/project/outputs/"
 
 # Load data
 data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
@@ -109,20 +109,19 @@ outcome_vars <- c("Depression", "Exhaustion", "Anxiety", "Safety", "No_Inc", "Re
 model_results <- list()
 
 for (var in outcome_vars) {
-  model <- lm(as.formula(paste(var, "~ Containment")), data = data)
+  model <- lm(as.formula(paste(var, "~ Containment")), data = data2)
   model_results[[var]] <- tidy(model, conf.int = TRUE)
 }
 
 plots <- list()
 for (var in outcome_vars) {
-  # Extract the model summary
   summary_df <- model_results[[var]]
   coef_info <- summary_df %>% filter(term == "Containment")
   beta <- coef_info$estimate
   se <- coef_info$std.error
   
   # Create scatter plot with regression line and annotation
-  p2 <- ggplot(data, aes_string(x = "Containment", y = var)) +
+  p2 <- ggplot(data2, aes_string(x = "Containment", y = var)) +
     geom_point(aes(weight = district_sample_size), alpha = 0.5) +
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     geom_text(aes(label = paste0("Beta: ", round(beta, 3), 
@@ -134,6 +133,69 @@ for (var in outcome_vars) {
     theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
   
   plots[[var]] <- p2
+}
+
+for (var in outcome_vars) {
+  filename <- paste0(output_path, "figures/plot_2", tolower(var), ".png")
+  ggsave(filename, plots[[var]], width = 10, height = 6, dpi = 300)
+}
+
+
+
+
+
+
+
+# 2
+data$final_status <- factor(data$final_status)
+
+# Filter and summarise data
+data2 <- data %>%
+  filter(final_status %in% c("Fully complete", "Partially complete")) %>% 
+  group_by(geo_district) %>%
+  summarise(
+    Containment = mean(ind_covid_zone, na.rm = TRUE),
+    Depression = mean(ind_fem_depression_change, na.rm = TRUE),
+    Exhaustion = mean(ind_fem_tired_change, na.rm = TRUE),
+    Anxiety = mean(ind_fem_worried_change, na.rm = TRUE),
+    Safety = mean(ind_fem_safety_change, na.rm = TRUE),
+    No_Inc = mean(hh_num_inc_reduced, na.rm = TRUE),
+    Reduced_meals = mean(ind_meals_reduced, na.rm = TRUE)
+  )
+
+outcome_vars <- c("Depression", "Exhaustion", "Anxiety", "Safety", "No_Inc", "Reduced_meals")
+
+model_results <- list()
+
+for (var in outcome_vars) {
+  model <- lm(as.formula(paste(var, "~ Containment")), data = data2)
+  model_results[[var]] <- tidy(model, conf.int = TRUE)
+}
+
+plots <- list()
+for (var in outcome_vars) {
+  summary_df <- model_results[[var]]
+  coef_info <- summary_df %>% filter(term == "Containment")
+  beta <- coef_info$estimate
+  se <- coef_info$std.error
+  
+  # Create scatter plot with regression line and annotation
+  p <- ggplot(data2, aes(x = Containment, y = get(var))) +
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, color = "blue") +
+    annotate("text", x = Inf, y = Inf, label = paste0("Beta: ", round(beta, 3), "\nSE: ", round(se, 3)), 
+             hjust = 1.05, vjust = 1.05, size = 3.5, color = "black") +
+    labs(title = paste("Scatter Plot of", var, "vs. Containment"),
+         x = "Containment", y = var) +
+    theme_minimal() +
+    theme(legend.position = "none", plot.title = element_text(hjust = 0.5), 
+          plot.background = element_rect(fill = "white"),
+          panel.background = element_rect(fill = "white"), 
+          axis.text = element_text(color = "black"), 
+          axis.title = element_text(color = "black"), 
+          text = element_text(color = "black"))
+  
+  plots[[var]] <- p
 }
 
 for (var in outcome_vars) {
