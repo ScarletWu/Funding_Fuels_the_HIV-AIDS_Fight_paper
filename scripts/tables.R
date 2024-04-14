@@ -8,7 +8,7 @@ library(sandwich)   # For robust standard errors
 # Set file paths
 data_path <- "/cloud/project/data/raw_data/"
 
-data <- read.dta("/cloud/project/data/raw_data/covid_gender_data.dta"))
+data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
 
 # Prepare data
 data$geo_state <- as.factor(data$geo_state)
