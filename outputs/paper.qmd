@@ -1,10 +1,10 @@
 ---
-title: "Evidence and Lessons from Public Health Funding's Impact on HIV/AIDS"
+title: " "
 author: Ruoxian Wu
 thanks: "Code and data are available at: https://github.com/ScarletWu/Funding_Fuels_the_HIV-AIDS_Fight.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/1783/"
 date: "April 2, 2024"
 date-format: long
-abstract: "This paper replicates and critically examines the study conducted by Marcus Dillender (2023) on the impact of the Ryan White CARE Act's Title I funding on HIV/AIDS outcomes. My replication focuses on the study's methodology, data integrity, and the robustness of its conclusions, particularly in the context of diagnosis and prevalence data. I assess the original findings through a reanalysis of public data sources and discuss the implications of our results for public health policy and future research directions."
+abstract: " "
 format: pdf
 toc: true
 number-sections: true
