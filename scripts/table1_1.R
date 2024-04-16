@@ -1,8 +1,7 @@
 library(haven)       # For read_dta
 library(dplyr)       # For data manipulation
-library(plm)         # For panel data models
-library(stargazer)   # For creating LaTeX tables
-library(lfe)         # For high-dimensional fixed effects (similar to lasso controls in Stata)
+library(glmnet)      # For lasso regression
+library(corrplot)
 
 # Paths to the data
 data_path <- "/cloud/project/data/raw_data/"
@@ -11,46 +10,72 @@ data_file <- paste0(data_path, "covid_gender_data.dta")
 # Load the data
 data <- read_dta(data_file)
 
-data$geo_state <- as.factor(data$geo_state)
-data$fem_resp_age <- as.factor(data$fem_resp_age)
-data$final_status <- as.factor(data$final_status)
+# Identify all predictors including the ones starting with 'asset_'
+predictors <- c("dist_prop_covid_zone", "geo_state", "fem_resp_age", "red_zone", "orange_zone", "cases_per_100000", "deaths_per_100000", "tran_inc_normal", "asset_index", grep("^asset_", names(data), value = TRUE), "ind_fem_resp_edu")
 
-# Filter data with complete cases for required variables
+# Filter out rows with any NA values across all these predictors and the response variable
 data_filtered <- data %>%
-  filter(!is.na(cases_per_100000) & !is.na(deaths_per_100000) & !is.na(red_zone) & 
-           !is.na(orange_zone) & !is.na(geo_state) & !is.na(fem_resp_age)) %>%
-  filter(!is.na(ind_fem_depression_change) & !is.na(ind_fem_tired_change) &
-           !is.na(ind_fem_worried_change) & !is.na(ind_fem_safety_change) &
-           final_status %in% c("1", "2"))
+  filter(!is.na(ind_fem_worried_change)) %>%
+  filter(rowSums(is.na(select(., all_of(predictors)))) == 0)
 
-# Define the panel data structure
-pdata <- pdata.frame(data_filtered, index = c("geo_state", "time"))
+# Build the predictor string for the model matrix
+predictor_formula <- paste(predictors, collapse = " + ")
+full_formula <- as.formula(paste("~", predictor_formula, "- 1"))
 
-# Placeholder for models (adjust according to your actual variable names and fixed effects)
-# Remember, the `lfe` package allows you to incorporate high-dimensional fixed effects
-models <- list()
-outcome_vars <- c("ind_fem_depression_change", "ind_fem_tired_change", "ind_fem_worried_change", "ind_fem_safety_change")
+# Create the model matrix from the filtered data
+x_matrix <- model.matrix(full_formula, data = data_filtered)
 
-for (outcome_var in outcome_vars) {
-  # Without lasso controls - only state and age FEs
-  formula_no_lasso <- as.formula(paste0(outcome_var, " ~ dist_prop_covid_zone + geo_state + fem_resp_age"))
-  model_no_lasso <- plm(formula_no_lasso, data = pdata, model = "within")
-  models[[paste0(outcome_var, "_no_lasso")]] <- model_no_lasso
-  
-  # With lasso - using lfe package
-  # Note: You'll need to determine how to select your controls, `lfe` can handle many fixed effects
-  formula_with_lasso <- as.formula(paste0(outcome_var, " ~ dist_prop_covid_zone + getfe(felm(", outcome_var, "~ geo_state + fem_resp_age + red_zone + orange_zone))"))
-  model_with_lasso <- felm(formula_with_lasso, data = pdata)
-  models[[paste0(outcome_var, "_with_lasso")]] <- model_with_lasso
+# Create y_vector from the same filtered data
+y_vector <- data_filtered$ind_fem_worried_change
+
+# Check dimensions to confirm they match
+if (nrow(x_matrix) == length(y_vector)) {
+  # Proceed with lasso model
+  lasso_model <- cv.glmnet(x_matrix, y_vector, alpha = 1, family = "binomial")
+  cat("Lasso model successfully fitted.\n")
+} else {
+  cat("Mismatch in dimensions found: x_matrix rows:", nrow(x_matrix), ", y_vector length:", length(y_vector), "\n")
 }
 
-# Creating the table (adjust the names according to the actual models)
-stargazer(models$ind_fem_depression_change_no_lasso, models$ind_fem_depression_change_with_lasso, ...,
-          type = "latex", out = "table1.tex",
-          title = "Relationship between Containment and Female Well-being",
-          align = TRUE,
-          column.labels = c("(1)", "(2)"),
-          covariate.labels = c("Containment", "State FE", "Age FE", "Lasso Controls", "Case and Death Controls"),
-          omit.stat = c("LL", "AIC", "BIC"),
-          label = "tab:mentalhealth",
-          table.placement = "H")
+# Check and add in-sample1 variable if lasso model is fitted
+if (exists("lasso_model")) {
+  selected <- which(coef(lasso_model, s = "lambda.min")[-1] != 0)
+  data_filtered$in_sample1 <- ifelse(seq_len(nrow(data_filtered)) %in% selected, 1, 0)
+}
+
+# Plotting the coefficient path
+plot(lasso_model, xvar = "lambda", label = TRUE)
+
+# Plotting cross-validated error
+plot(lasso_model$glmnet.fit, main = "Lasso Model - Cross-Validated Error")
+with(lasso_model, plot(lambda, cvm, type='l', lwd=2, xlab="Log(Lambda)", ylab="Mean Squared Error", main="Cross-Validation Plot"))
+abline(v=log(lasso_model$lambda.min), col="red", lwd=2)
+
+# Extracting coefficients at the lambda that minimizes cross-validation error
+coef_min_lambda <- coef(lasso_model, s = "lambda.min")
+selected_vars <- coef_min_lambda[coef_min_lambda[, 1] != 0, , drop = FALSE]
+
+# Print the selected variables
+print(selected_vars)
+
+# Extracting coefficients at the lambda that minimizes cross-validation error
+coef_min_lambda <- coef(lasso_model, s = "lambda.min")
+selected_vars <- coef_min_lambda[coef_min_lambda[, 1] != 0, , drop = FALSE]
+
+# Print the selected variables
+print(selected_vars)
+
+# Convert the sparse matrix to a regular matrix (or vector) and create a data frame
+selected_df <- as.data.frame(as.matrix(selected_vars))
+selected_df$Variable <- rownames(selected_df)
+colnames(selected_df)[1] <- "Coefficient"
+
+# Replace underscores with spaces in variable names
+selected_df$Variable <- gsub("_", " ", selected_df$Variable)
+
+# Plot non-zero coefficients
+ggplot(selected_df, aes(x = Variable, y = Coefficient)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  labs(x = "Predictor Variables", y = "Coefficient Value", title = "Non-Zero Coefficients from Lasso Model")

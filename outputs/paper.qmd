@@ -1,8 +1,8 @@
 ---
-title: " "
+title: "Tracing Hidden Struggles of Rural Indian Women during Pandemic"
 author: Ruoxian Wu
 thanks: "Code and data are available at: https://github.com/ScarletWu/Tracing_Hidden_Struggles_of_Rural_Indian_Women_during_Pandemic.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/1783/"
-date: "April 2, 2024"
+date: "April 16, 2024"
 date-format: long
 abstract: " "
 format: pdf
@@ -14,17 +14,17 @@ bibliography: references.bib
 
 # Introduction
 
-Public health funding plays a crucial role in optimizing public health outcomes. To understand the impact of federal funding on HIV/AIDS healthcare, Marcus Dillender's paper "Evidence and Lessons on the Health Impacts of Public Health Funding from the Fight against HIV/AIDS" (2023) assesses the efficacy of Title I funding of the Ryan White Comprehensive AIDS Resources Emergency (CARE) Act [@Dillender2023]. By examining its impact on HIV/AIDS-related mortality and incidence rates, the paper reveals the impact of public funding. 
+Public health funding significantly impacts public health outcomes, particularly during global health emergencies like the COVID-19 pandemic. In the study "Women’s well-being during a pandemic and its containment" published in the Journal of Development Economics (2022), the authors explore the dual crisis of disease and the containment policies designed to mitigate its spread, focusing specifically on their effects on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study, aiming to understand the nuanced impacts of such policies on various aspects of women's well-being, including mental health and food security.
 
-In this paper, I aim to replicate Dillender's research using available public data and direct my attention to the non-mortality outcomes of the Ryan White CARE Act's Title I funding. I examine its influence on the diagnosis and prevalence rates of HIV/AIDS. It offers a unique perspective on HIV/AIDS-affected populations and potential public health interventions for enhancing their quality of life. Based on Dillender's methodology, I employ difference-in-differences and regression discontinuity designs to examine the sensitivity of the findings to different analyses. As a result of this reanalysis, the original study's results are validated and a dialogue on how to interpret public health data regarding policy impact assessments is stimulated.
+In my analysis, I replicate the original study’s research using publicly available data, extending the investigation to assess how containment measures affect the broader socio-economic outcomes beyond what was initially reported. Utilizing methodologies such as difference-in-differences and regression discontinuity designs, this paper evaluates the sensitivity of the findings to different analytical approaches. By doing so, it seeks to validate the original results while stimulating further discussion on interpreting data to assess public health policies' impacts.
 
-This critical replication explores the complex issues surrounding public health funding. I analyze the interplay of financial inputs, health outcomes, and the socio-economic fabrics they weave into. I hope that this critical replication encourages a more nuanced approach to future research in public health finance and policy-making. Throughout this investigation, I keep an eye on societal, economic, and systemic factors that influence public health and how federal funding operates within that ecosystem.
+This critical analysis endeavors to unravel the complex relationships between public health funding, policy effectiveness, and their socio-economic ramifications. Through a detailed reexamination of the original study’s data and methodology, this paper contributes to a more comprehensive understanding of how public health initiatives can be optimized to better serve vulnerable populations during crises. My analysis keeps a keen eye on the societal, economic, and systemic factors that shape public health outcomes and the operational dynamics of public funding within these contexts.
 
 # Data
 My reproduction used the programming language R [@r], the analysis used the following packages: Haven[@rHaven], Dplyr [@rDplyr], Ggplot2 [@rGgplot2], Readr [@rReadr], Here [@rHere], Janitor [@rJanitor], KableExtra [@rKableExtra], Knitr [@rKnitr], Tidyverse [@rTidyverse].My reproduction seeks to address two findings written in the original paper.
 
 ## Source
-The paper used for replication is from American Economic Association, American Economic Review. The replication package is downloaded from Evidence and Lessons on the Health Impacts of Public Health Funding from the Fight against HIV/AIDS, under Additional Materials. 
+The paper used for replication is from American Economic Association, American Economic Review. The replication package is downloaded from . 
 
 ## Variables
 

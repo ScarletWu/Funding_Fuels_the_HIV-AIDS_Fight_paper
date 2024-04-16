@@ -312,24 +312,3 @@ lm_models <- list(
   ind_fem_safety_change = lm_models$ind_fem_safety_change,
   mental_index_change = lm_models$mental_index_change
 )
-
-stargazer(
-  lm_models$ind_fem_depression_change, 
-  lm_models$ind_fem_tired_change, 
-  lm_models$ind_fem_worried_change,
-  lm_models$ind_fem_safety_change,
-  lm_models$mental_index_change,
-  type = "text",
-  title = "Relationship between Containment and Female Well-being",
-  align = TRUE,
-  dep.var.labels.include = FALSE,
-  dep.var.caption = "Dependent variable: Well-being metric",
-  covariate.labels = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", "Case and Death Controls"),
-  omit.stat = c("LL", "ser", "f"),
-  add.lines = list(
-    c("Dep Var. Mean", "0.344", "0.276", "0.301", "0.299", "0.307"),
-    c("Adjusted R-squared", "0.009", "0.022", "0.052", "0.006", "0.021"),
-    c("Observations", "489", "489", "489", "489", "489")
-  ),
-  out = "table1.txt"
-)
