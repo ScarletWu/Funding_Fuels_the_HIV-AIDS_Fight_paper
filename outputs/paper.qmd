@@ -87,8 +87,8 @@ data$geo_district <- as.factor(data$geo_district)
 data$final_status <- as_factor(data$final_status)
 # Figure 1a: Histogram of Income
 p1a <- ggplot(data, aes(x = tran_inc_normal)) +
-  geom_histogram(aes(y = ..density..), color = "gray", fill = "gray", bins = 30) +
-  geom_histogram(data = data, aes(x = tran_inc_current, y = ..density..), 
+  geom_histogram(aes(y = after_stat(density)), color = "gray", fill = "gray", bins = 30) +
+  geom_histogram(data = data, aes(x = tran_inc_current, y = after_stat(density)), 
                  color = "black", fill = NA, bins = 30) +
   labs(title = "Distributions of Transformed Income",
        x = "Inverse Hyperbolic Sin of Income (in Rs.)",
@@ -99,7 +99,6 @@ p1a <- ggplot(data, aes(x = tran_inc_normal)) +
                      labels = c("Normal Month", "Current Month")) +
   theme(legend.title = element_blank(), legend.position = "bottom")
 
-ggsave("/cloud/project/outputs/figures/fig1a.png", plot = p1a, width = 10, height = 8, dpi = 300)
 
 
 # figure 1b
@@ -144,8 +143,6 @@ coef_plot <- ggplot(model_summaries, aes(x = estimate, y = term, xmin = conf.low
   scale_y_discrete(labels = y_labels) +
   labs(title = "Effect of COVID-19 on Various Outcomes", x = "Percent", y = "") +
   theme_minimal()
-
-ggsave(paste0(output_path, "/figures/fig1b.png"), plot = coef_plot, width = 10, height = 5, dpi = 300)
 
 p1a
 coef_plot
