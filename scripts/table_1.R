@@ -6,11 +6,9 @@ library(glmnet)
 library(dplyr)
 library(haven)  # For read_dta if haven is used
 
-# Set file paths
+# Load the data
 data_path <- "/cloud/project/data/raw_data/"
 data_file <- paste0(data_path, "covid_gender_data.dta")
-
-# Load the data
 data <- read_dta(data_file)
 
 # Convert appropriate columns to factors

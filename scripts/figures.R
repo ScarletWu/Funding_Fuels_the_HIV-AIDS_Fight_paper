@@ -12,11 +12,9 @@ library(sandwich)
 library(glmnet)
 
 
-# Set file paths
+# Load data
 data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs/"
-
-# Load data
 data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
 
 # Prepare data

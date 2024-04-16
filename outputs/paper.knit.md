@@ -12,6 +12,7 @@ bibliography: references.bib
 ---
 
 
+
 # Introduction
 
 Public health funding significantly impacts public health outcomes, particularly during global health emergencies like the COVID-19 pandemic. In the study "Women’s well-being during a pandemic and its containment" published in the Journal of Development Economics (2022), the authors explore the dual crisis of disease and the containment policies designed to mitigate its spread, focusing specifically on their effects on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study, aiming to understand the nuanced impacts of such policies on various aspects of women's well-being, including mental health and food security.
@@ -41,118 +42,23 @@ The data from the phone survey included detailed questions on mental health usin
 Subsequent to data collection, the data were organized and analyzed using statistical software, with the authors employing advanced econometric techniques such as difference-in-differences and regression discontinuity designs to assess the impact of varying levels of containment. This rigorous analytical approach helps to isolate the effects of public health interventions from other confounding factors.
 
 # Results
-```{r}
-#| message: false
-#| include: false
-# Install packages
-library(haven)
-library(fixest)
-library(foreign)
-library(ggplot2)
-library(dplyr)
-library(lfe)
-library(stargazer)
-library(coefplot)
-library(broom)
-library(lmtest)
-library(sandwich)
-library(glmnet)
-library(haven)
-library(dplyr)
-library(glmnet)
-library(ggplot2)
-library(broom)  
-library(caret)
-```
 
 
-```{r}
-#| message: false
-#| include: false
-# Load data
-data_path <- "/cloud/project/data/raw_data/"
-output_path <- "/cloud/project/outputs/"
-data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
-```
-
-```{r}
-#| label: fig-1
-#| fig-cap: "Impact of general economic disruptions on income and women's welfare."
-#| echo: false
-#| warning: false
-#| message: false
-#| layout-ncol: 2
-#| fig-subcap: ["Distribution of monthly income in rupees for household heads", "Share of households with lower income, fewer meals, and declining female well-being"]
-
-# Prepare data
-data$geo_state <- as.factor(data$geo_state)
-data$geo_district <- as.factor(data$geo_district)
-data$final_status <- as_factor(data$final_status)
-# Figure 1a: Histogram of Income
-p1a <- ggplot(data, aes(x = tran_inc_normal)) +
-  geom_histogram(aes(y = ..density..), color = "gray", fill = "gray", bins = 30) +
-  geom_histogram(data = data, aes(x = tran_inc_current, y = ..density..), 
-                 color = "black", fill = NA, bins = 30) +
-  labs(title = "Distributions of Transformed Income",
-       x = "Inverse Hyperbolic Sin of Income (in Rs.)",
-       y = "Density") +
-  scale_fill_manual(values = c("gray", "black"),
-                    labels = c("Normal Month", "Current Month")) +
-  scale_color_manual(values = c("gray", "black"),
-                     labels = c("Normal Month", "Current Month")) +
-  theme(legend.title = element_blank(), legend.position = "bottom")
-
-ggsave("/cloud/project/outputs/figures/fig1a.png", plot = p1a, width = 10, height = 8, dpi = 300)
 
 
-# figure 1b
-data1b <- data %>%
-  mutate(
-    inc_lost = tran_inc_normal - tran_inc_current,
-    ind_inc_lost = ifelse(inc_lost > 0, 1, NA),
-    ind_meals_reduced = as.numeric(ind_meals_reduced),
-    ind_fem_depression_change = as.numeric(ind_fem_depression_change),
-    ind_fem_worried_change = as.numeric(ind_fem_worried_change),
-    ind_fem_tired_change = as.numeric(ind_fem_tired_change),
-    ind_fem_safety_change = as.numeric(ind_fem_safety_change)
-  )
 
-get_model_summary <- function(dependent_var) {
-  model <- lm(as.formula(paste(dependent_var, "~ 1")), data = data1b)
-  tidy_model <- tidy(model, conf.int = TRUE)
-  tidy_model$term <- dependent_var
-  return(tidy_model)
-}
+::: {#fig-1 .cell layout-ncol="2"}
+::: {.cell-output-display}
+![Distribution of monthly income in rupees for household heads](paper_files/figure-pdf/fig-1-1.pdf){#fig-1-1}
+:::
 
-model_summaries <- bind_rows(
-  get_model_summary("ind_inc_lost"),
-  get_model_summary("ind_meals_reduced"),
-  get_model_summary("ind_fem_depression_change"),
-  get_model_summary("ind_fem_worried_change"),
-  get_model_summary("ind_fem_tired_change"),
-  get_model_summary("ind_fem_safety_change")
-)
+::: {.cell-output-display}
+![Share of households with lower income, fewer meals, and declining female well-being](paper_files/figure-pdf/fig-1-2.pdf){#fig-1-2}
+:::
 
-y_labels <- c(
-  "ind_inc_lost" = "Lost Income",
-  "ind_meals_reduced" = "Reduced Meals",
-  "ind_fem_depression_change" = "More Depressed",
-  "ind_fem_worried_change" = "More Anxious",
-  "ind_fem_tired_change" = "More Exhausted",
-  "ind_fem_safety_change" = "Less Safe"
-)
+Impact of general economic disruptions on income and women's welfare.
+:::
 
-coef_plot <- ggplot(model_summaries, aes(x = estimate, y = term, xmin = conf.low, xmax = conf.high)) +
-  geom_pointrange() +
-  scale_y_discrete(labels = y_labels) +
-  labs(title = "Effect of COVID-19 on Various Outcomes", x = "Percent", y = "") +
-  theme_minimal()
-
-ggsave(paste0(output_path, "/figures/fig1b.png"), plot = coef_plot, width = 10, height = 5, dpi = 300)
-
-p1a
-coef_plot
-```
 # Discussion
 In progress
 
