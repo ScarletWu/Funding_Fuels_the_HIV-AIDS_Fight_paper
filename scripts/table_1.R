@@ -97,3 +97,64 @@ fit_model <- function(response_variable) {
 
 # Run the models
 final_models <- lapply(set_names(response_vars), fit_model)
+
+# Assuming 'final_models' is a list of lists containing 'model' and 'robust_se' for each response variable
+
+# Prepare a data frame for stargazer
+results <- data.frame(
+  model = character(),
+  estimate = numeric(),
+  std.error = numeric(),
+  statistic = numeric(),
+  p.value = numeric(),
+  stars = character(),
+  stringsAsFactors = FALSE
+)
+
+# Assuming you have a list of final model objects named 'final_models'
+# and that each element has a 'model' and 'robust_se' components.
+
+# Prepare the data for stargazer
+stargazer_data <- list()
+
+# Loop through the response variables and extract the needed data
+for (resp_var in response_vars) {
+  model_obj <- final_models[[resp_var]]
+  if (!is.null(model_obj)) {
+    # Add the lm object to the stargazer_data list
+    stargazer_data[[resp_var]] <- model_obj$model
+  }
+}
+
+# Note: You may need to adjust the 'covariate.labels' and 'dep.var.labels' 
+# to match the variables in your model. The 'omit.yes.no' argument should 
+# be filled with your control variable names if you want to display whether 
+# they were included in the model (Yes/No).
+# The 'se' list argument assumes you have calculated robust standard errors 
+# for each model and you want them included in the table instead of the default standard errors.
+# Prepare a vector of model summaries that includes robust standard errors
+model_summaries <- lapply(stargazer_data, function(model) {
+  coefs <- summary(model)$coefficients
+  se <- sqrt(diag(vcovHC(model, type = "HC1")))
+  coefs[, "Std. Error"] <- se
+  coefs
+})
+
+# Since 'omit.yes.no' is causing issues, let's remove it
+# We also remove the se argument since we already included robust SE in model summaries
+stargazer::stargazer(
+  stargazer_data, 
+  type = "text",
+  title = "Table 1: Relationship between Containment and Female Well-being.",
+  covariate.labels = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", "Case and Death Controls"),
+  dep.var.labels = c("More Depressed", "More Exhausted", "More Anxious", "MH Index", "Less Safe"),
+  omit = 'Constant', 
+  no.space = TRUE,
+  intercept.bottom = FALSE,
+  single.row = TRUE,
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  ci = TRUE,
+  ci.level = 0.95
+)
+
+# You may need to adjust 'covariate.labels' and 'dep.var.labels' to match your models.

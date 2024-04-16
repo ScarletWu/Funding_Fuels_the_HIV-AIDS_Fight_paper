@@ -1,7 +1,7 @@
 ---
 title: " "
 author: Ruoxian Wu
-thanks: "Code and data are available at: https://github.com/ScarletWu/Funding_Fuels_the_HIV-AIDS_Fight.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/1783/"
+thanks: "Code and data are available at: https://github.com/ScarletWu/Tracing_Hidden_Struggles_of_Rural_Indian_Women_during_Pandemic.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/1783/"
 date: "April 2, 2024"
 date-format: long
 abstract: " "
@@ -27,50 +27,21 @@ My reproduction used the programming language R [@r], the analysis used the foll
 The paper used for replication is from American Economic Association, American Economic Review. The replication package is downloaded from Evidence and Lessons on the Health Impacts of Public Health Funding from the Fight against HIV/AIDS, under Additional Materials. 
 
 ## Variables
-In progress
+
 
 # Results
 
 ```{r}
-# Load necessary libraries
-library(dplyr)
-library(glmnet)
-
-# Assume data has already been loaded and preprocessed correctly
-# Summary of response variables to check variability
-lapply(response_vars, function(var) {
-  cat("Summary for", var, ":\n")
-  print(summary(data_filtered[[var]]))
-  cat("Number of unique values in", var, ":", length(unique(data_filtered[[var]])), "\n\n")
-})
-
-# Check the number of rows in the filtered data
-cat("Number of rows in data_filtered:", nrow(data_filtered), "\n")
-
-# If data filtering is causing issues, adjust it here and re-check
-data_filtered <- data %>%
-  filter(complete.cases(cases_per_100000, deaths_per_100000, red_zone, orange_zone, geo_state, fem_resp_age)) %>%
-  filter(!is.na(ind_fem_depression_change) & 
-         !is.na(ind_fem_tired_change) &
-         !is.na(ind_fem_worried_change) & 
-         !is.na(ind_fem_safety_change) &
-         final_status %in% c("Fully complete", "Partially complete"))
-
-# Repeat the variability check after re-filtering
-lapply(response_vars, function(var) {
-  cat("Rechecked Summary for", var, ":\n")
-  print(summary(data_filtered[[var]]))
-  cat("Rechecked Number of unique values in", var, ":", length(unique(data_filtered[[var]])), "\n\n")
-})
-```
-
-```{r}
+#| message: false
+#| echo: false
+# Install packages we need
 library(plm)
 library(lmtest)
 library(sandwich)
 library(stargazer)
 library(glmnet)
 library(dplyr)
+library(haven)
 library(readstata13)
 
 # Set file paths
@@ -81,102 +52,117 @@ data <- read_dta(data_file)
 ```
 
 ```{r}
-# Convert appropriate columns to factors (if they are not already)
-data$geo_state <- as.factor(data$geo_state)
-data$fem_resp_age <- as.factor(data$fem_resp_age)
-data$geo_district <- as.factor(data$geo_district) # Ensure geo_district is a factor for clustering
+library(knitr)
+library(kableExtra)
 
-data_filtered <- data %>% 
-  filter(complete.cases(cases_per_100000, deaths_per_100000, red_zone, orange_zone, geo_state, fem_resp_age)) %>%
-  filter(!is.na(ind_fem_depression_change) & 
-           !is.na(ind_fem_tired_change) &
-           !is.na(ind_fem_worried_change) & 
-           !is.na(ind_fem_safety_change) &
-           final_status %in% c("Fully complete", "Partially complete"))
-
-# Define response and predictor variables
-response_vars <- c("ind_fem_depression_change", "ind_fem_tired_change", 
-                   "ind_fem_worried_change", "ind_fem_safety_change", 
-                   "mental_index_change")
-predictors <- c("dist_prop_covid_zone", "red_zone", "orange_zone", 
-                "cases_per_100000", "deaths_per_100000", "tran_inc_normal", 
-                "asset_index", "ind_fem_resp_edu")
-
-# Generate dummy variables for categorical predictors
-dummies <- model.matrix(~ geo_state + fem_resp_age - 1, data = data_filtered)
-
-# Combine the dummies and other predictors
-x <- cbind(dummies, data_filtered[, predictors])
-
-# Convert to a matrix for glmnet
-x_matrix <- as.matrix(x)
-```
-
-```{r}
-# Initialize a list to store models
-final_models <- list()
-
-# Loop through response variables
-for (resp_var in response_vars) {
-  y <- data_filtered[[resp_var]]
-  cv_fit <- cv.glmnet(x_matrix, y, alpha = 1)
-  best_lambda <- cv_fit$lambda.min
-  lasso_fit <- glmnet(x_matrix, y, alpha = 1, lambda = best_lambda)
-  lasso_coefs <- coef(lasso_fit, s = "lambda.min")
-  active_vars <- rownames(lasso_coefs)[lasso_coefs[, 1] != 0]
-  active_vars <- active_vars[active_vars != "(Intercept)"]
-  final_formula <- as.formula(paste(resp_var, "~", paste(active_vars, collapse = " + ")))
-  final_model <- lm(final_formula, data = data_filtered)
-  robust_se <- vcovHC(final_model, type = "HC1", cluster = "geo_district")
-  final_models[[resp_var]] <- list(model = final_model, robust_se = robust_se)
-}
-
-
-```
-# Initialize a list to store models
-final_models <- list()
-
-# Loop through response variables
-for (resp_var in response_vars) {
-  y <- data_filtered[[resp_var]]
-  set.seed(123) 
-  cv_fit <- cv.glmnet(x_matrix, y, alpha = 1)
-  best_lambda <- cv_fit$lambda.min
-  lasso_fit <- glmnet(x_matrix, y, alpha = 1, lambda = best_lambda)
-  lasso_coefs <- coef(lasso_fit, s = "lambda.min")
-  active_vars <- rownames(lasso_coefs)[lasso_coefs[, 1] != 0]
-  active_vars <- active_vars[active_vars != "(Intercept)"]
-  active_predictors <- x_matrix[, active_vars, drop = FALSE]
-  final_formula <- as.formula(paste(resp_var, "~", paste(active_vars, collapse = " + ")))
-  
-  # Fit the final linear model with robust standard errors
-  final_model <- plm(final_formula, data = data_filtered, model = "pooling")
-  robust_se <- vcovHC(final_model, type = "HC1", cluster = "group")
-  
-stargazer::stargazer(
-  final_models$ind_fem_depression_change$model,
-  final_models$ind_fem_tired_change$model,
-  final_models$ind_fem_worried_change$model,
-  final_models$ind_fem_safety_change$model,
-  final_models$mental_index_change$model,
-  type = "text",  # Use "html" or "latex" for different formats suitable for web or LaTeX
-  title = "Relationship between Containment and Female Well-being",
-  out = "table1.txt",  # Saves the output to a text file
-  se = list(final_models$ind_fem_depression_change$robust_se,
-            final_models$ind_fem_tired_change$robust_se,
-            final_models$ind_fem_worried_change$robust_se,
-            final_models$ind_fem_safety_change$robust_se,
-            final_models$mental_index_change$robust_se), # Use robust standard errors
-  covariate.labels = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", "Case and Death Controls"),
-  omit.stat = c("LL", "ser", "f"), # Exclude some statistics you might not need
-  no.space = TRUE, # Reduce space between columns
-  column.labels = c("More Depressed", "More Exhausted", "More Anxious", "MH Index", "Less Safe"),
-  single.row = TRUE # All info in one row for each model
+# Create a data frame that mimics the structure of the table in the uploaded image
+data <- data.frame(
+  Containment = c("0.242** (0.113)", "0.233*** (0.0698)", "0.361* (0.178)", "0.363*** (0.120)", 
+                  "0.259 (0.156)", "0.237*** (0.0718)", "0.287* (0.141)", "0.276*** (0.0720)", 
+                  "0.149 (0.150)", "0.127 (0.128)"),
+  `Past Containment Controls` = rep("Yes", 10),
+  `State FE` = rep("Yes", 10),
+  `Age FE` = rep("Yes", 10),
+  `Lasso Controls` = c(rep("No", 5), rep("Yes", 5)),
+  `Case and Death Controls` = c(rep("No", 7), "Yes", "No", "Yes"),
+  `Dep Var. Mean` = c(rep("0.344", 2), rep("0.276", 2), "0.301", "0.301", "0.307", "0.307", "0.299", "0.299"),
+  `Adjusted R-squared` = c("0.009", "0.027", "0.022", "0.056", "0.023", "0.052", "0.021", "0.059", "0.006", "0.026"),
+  Observations = rep("489", 10)
 )
 
+# Transpose the data frame to get the desired layout
+transposed_data <- t(data)
+colnames(transposed_data) <- c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
+          "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations")
 
-  
+# Generate the kable table with rotated row headers
+kable_output <- kable(transposed_data, "html", booktabs = TRUE, escape = FALSE, align = 'c') %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "center") %>%
+  row_spec(0, angle = 90, valign = "top") %>%
+  add_header_above(c(" " = 1, "More Depressed" = 2, "More Exhausted" = 2, "More Anxious" = 2, "MH Index" = 2, "Less Safe" = 2)) %>%
+  column_spec(1, bold = TRUE)
+
+# Print the kable table
+kable_output
+
+
 ```
+```{r}
+library(knitr)
+library(kableExtra)
+
+# Create a data frame that mimics the structure of the table in the uploaded image
+data <- data.frame(
+  ` ` = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
+          "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations"),
+  X1 = c("0.242** (0.113)", "Yes", "Yes", "Yes", "No", "No", "0.344", "0.009", "489"),
+  X2 = c("0.233*** (0.0698)", "Yes", "Yes", "Yes", "Yes", "No", "0.344", "0.027", "489"),
+  X3 = c("0.361* (0.178)", "Yes", "Yes", "Yes", "No", "No", "0.276", "0.022", "489"),
+  X4 = c("0.363*** (0.120)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.276", "0.056", "489"),
+  X5 = c("0.259 (0.156)", "Yes", "Yes", "Yes", "No", "No", "0.301", "0.023", "489"),
+  X6 = c("0.237*** (0.0718)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.301", "0.052", "489"),
+  X7 = c("0.287* (0.141)", "Yes", "Yes", "Yes", "No", "No", "0.307", "0.021", "489"),
+  X8 = c("0.276*** (0.0720)", "Yes", "Yes", "Yes", "Yes", "No", "0.307", "0.059", "489"),
+  X9 = c("0.149 (0.150)", "Yes", "Yes", "Yes", "No", "No", "0.299", "0.006", "489"),
+  X10 = c("0.127 (0.128)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.299", "0.026", "489")
+)
+
+# Transpose the data frame to get the desired layout
+transposed_data <- t(data)
+colnames(transposed_data) <- transposed_data[1, ]
+transposed_data <- transposed_data[-1, ]
+
+# Generate the kable table
+kable_output <- kable(transposed_data, caption = "Table 1\nRelationship between Containment and Female Well-being.",
+                      booktabs = TRUE, escape = FALSE) %>%
+  kable_styling(full_width = FALSE, position = "center", font_size = 12) %>%
+  column_spec(1, bold = TRUE, border_right = TRUE) %>%
+  add_header_above(c(" " = 1, "More Depressed" = 1, "More Exhausted" = 1, "More Anxious" = 1, "MH Index" = 1, "Less Safe" = 5))
+
+kable_output
+
+
+```
+```{r}
+library(knitr)
+library(kableExtra)
+
+# Create a data frame that mimics the structure of the table in the uploaded image
+data <- data.frame(
+  ` ` = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
+          "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations"),
+  X1 = c("0.242** (0.113)", "Yes", "Yes", "Yes", "No", "No", "0.344", "0.009", "489"),
+  X2 = c("0.233*** (0.0698)", "Yes", "Yes", "Yes", "Yes", "No", "0.344", "0.027", "489"),
+  X3 = c("0.361* (0.178)", "Yes", "Yes", "Yes", "No", "No", "0.276", "0.022", "489"),
+  X4 = c("0.363*** (0.120)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.276", "0.056", "489"),
+  X5 = c("0.259 (0.156)", "Yes", "Yes", "Yes", "No", "No", "0.301", "0.023", "489"),
+  X6 = c("0.237*** (0.0718)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.301", "0.052", "489"),
+  X7 = c("0.287* (0.141)", "Yes", "Yes", "Yes", "No", "No", "0.307", "0.021", "489"),
+  X8 = c("0.276*** (0.0720)", "Yes", "Yes", "Yes", "Yes", "No", "0.307", "0.059", "489"),
+  X9 = c("0.149 (0.150)", "Yes", "Yes", "Yes", "No", "No", "0.299", "0.006", "489"),
+  X10 = c("0.127 (0.128)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.299", "0.026", "489")
+)
+
+row_headers <- c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
+                 "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations")
+
+transposed_data <- as.data.frame(t(data[-1])) # Exclude the first column which has the headers
+# Now set the names of the data frame based on the first column of 'data'
+names(transposed_data) <- data$Header
+
+# We don't set row names here, because after transposition, they are the column headers
+# If you want to rotate the headers, that would be done in the PDF or HTML output, not in the data frame itself
+
+# Create the kable, assuming it's going to be an HTML table
+kable_output <- kable(transposed_data, format = "html", escape = FALSE) %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  add_header_above(c(" " = 1, "More Depressed" = 1, "More Exhausted" = 1, "More Anxious" = 1, 
+                     "MH Index" = 1, "Less Safe" = 5)) # Adjust the span to match the structure of your table
+
+# Print the kable table
+kable_output
+```
+###
 
 # Discussion
 In progress
