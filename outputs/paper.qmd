@@ -55,11 +55,6 @@ library(broom)
 library(lmtest)
 library(sandwich)
 library(glmnet)
-library(haven)
-library(dplyr)
-library(glmnet)
-library(ggplot2)
-library(broom)  
 library(caret)
 ```
 
@@ -69,33 +64,35 @@ library(caret)
 # Load data
 data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs/"
-data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
+data <- read_dta(paste0(data_path, "covid_gender_data.dta"))
 ```
+
 
 ```{r}
 #| label: fig-1
 #| fig-cap: "Impact of general economic disruptions on income and women's welfare."
 #| echo: false
-#| warning: false
-#| message: false
+
 #| layout-ncol: 2
 #| fig-subcap: ["Distributions of Transformed Income", "Effect of COVID-19 on Various Outcomes"]
 
-# Prepare data
 data$geo_state <- as.factor(data$geo_state)
 data$geo_district <- as.factor(data$geo_district)
-data$final_status <- as_factor(data$final_status)
+data$final_status <- as.factor(data$final_status)
+
+# To avoid the warning, make sure you filter out NA and infinite values from your income variables
+data <- data %>%
+  filter(!is.na(tran_inc_normal), !is.infinite(tran_inc_normal),
+         !is.na(tran_inc_current), !is.infinite(tran_inc_current))
+
 # Figure 1a: Histogram of Income
 p1a <- ggplot(data, aes(x = tran_inc_normal)) +
   geom_histogram(aes(y = after_stat(density)), color = "gray", fill = "gray", bins = 30) +
-  geom_histogram(data = data, aes(x = tran_inc_current, y = after_stat(density)), 
+  geom_histogram(aes(x = tran_inc_current, y = after_stat(density)), 
                  color = "black", fill = NA, bins = 30) +
-  labs(x = "Inverse Hyperbolic Sin of Income (in Rs.)",
+  labs(title = "Distributions of Transformed Income",
+       x = "Inverse Hyperbolic Sin of Income (in Rs.)",
        y = "Density") +
-  scale_fill_manual(values = c("gray", "black"),
-                    labels = c("Normal Month", "Current Month")) +
-  scale_color_manual(values = c("gray", "black"),
-                     labels = c("Normal Month", "Current Month")) +
   theme(legend.title = element_blank(), legend.position = "bottom")
 
 
@@ -147,7 +144,35 @@ p1a
 coef_plot
 ```
 
+
+
+
+The analysis reveals significant impacts of the COVID-19 pandemic on women's well-being in rural India. Specifically, moving from zero to average containment levels is associated with a 38% increase in the likelihood of women reporting more depression, a 73% increase in reporting more exhaustion, and a 44% increase in reporting more anxiety. These effects are further magnified among women with daughters and those living in female-headed households, underscoring the compounded vulnerabilities these groups face.
+
+## Mental Health Deterioration
+The study documents a significant deterioration in mental health among the surveyed women, with increases in reported depression, exhaustion, and anxiety. These findings align with broader literature indicating that women, particularly in lower-income settings, bear a disproportionate burden of mental health challenges during crises.
+
+## Economic and Nutritional Impact
+Economically, the pandemic led to dramatic income losses and heightened food insecurity, with the latter particularly pronounced among women. The findings suggest that containment measures, while necessary for public health, inadvertently exacerbated these issues, underscoring the need for targeted support measures.
+
+
 # Discussion
+## Socioeconomic Strain and Mental Health
+The data suggest that the socioeconomic strains induced by the pandemic—compounded by containment measures—have had a profound impact on women's mental health. These findings are critical, given the limited social safety nets available in many parts of rural India, which amplify the adverse effects of such crises.
+
+## Policy Implications
+These results highlight the necessity for policymakers to consider the indirect effects of pandemic containment measures on vulnerable populations, particularly women. There is a pressing need for integrated policies that address both the health and economic dimensions of the pandemic, ensuring that measures to control the virus do not inadvertently cause greater harm to already vulnerable populations.
+
+## Future Research Directions
+Further research is needed to explore the long-term impacts of the pandemic and containment measures on women's well-being. Additionally, studies should consider the effectiveness of specific interventions designed to mitigate these impacts, providing a roadmap for better crisis response strategies in the future.
+
+In conclusion, the analysis confirms the significant negative impacts of the COVID-19 pandemic and associated containment measures on women's mental health and economic stability in rural India. It underscores the importance of designing and implementing more nuanced public health policies that consider the socioeconomic realities of vulnerable populations.
+
+
+
+
+
+
 
 In progress
 
