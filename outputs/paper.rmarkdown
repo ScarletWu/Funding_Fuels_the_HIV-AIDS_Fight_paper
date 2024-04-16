@@ -11,6 +11,7 @@ number-sections: true
 bibliography: references.bib
 ---
 
+
 # Introduction
 
 Public health funding significantly impacts public health outcomes, particularly during global health emergencies like the COVID-19 pandemic. In the study "Women’s well-being during a pandemic and its containment" published in the Journal of Development Economics (2022), the authors explore the dual crisis of disease and the containment policies designed to mitigate its spread, focusing specifically on their effects on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study, aiming to understand the nuanced impacts of such policies on various aspects of women's well-being, including mental health and food security.
@@ -38,6 +39,7 @@ The data from the phone survey included detailed questions on mental health usin
 Subsequent to data collection, the data were organized and analyzed using statistical software, with the authors employing advanced econometric techniques such as difference-in-differences and regression discontinuity designs to assess the impact of varying levels of containment. This rigorous analytical approach helps to isolate the effects of public health interventions from other confounding factors.
 
 # Results
+
 
 ```{r}
 #| message: false
@@ -147,8 +149,10 @@ p1a
 coef_plot
 ```
 
+
 # Discussion
 
 In progress
 
 # Reference
+
