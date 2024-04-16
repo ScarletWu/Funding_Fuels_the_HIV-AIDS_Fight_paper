@@ -48,8 +48,6 @@ selected_vars <- rownames(nonzero_coef)
 print(selected_vars)
 
 
-# Load necessary libraries for analysis and plotting
-
 
 
 # Display coefficients with their values

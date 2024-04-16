@@ -1,0 +1,336 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{5}
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Tracing Hidden Struggles of Rural Indian Women during Pandemic},
+  pdfauthor={Ruoxian Wu},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Tracing Hidden Struggles of Rural Indian Women during
+Pandemic\thanks{Code and data are available at:
+https://github.com/ScarletWu/Tracing\_Hidden\_Struggles\_of\_Rural\_Indian\_Women\_during\_Pandemic.git.
+Replication on Social Science Reproduction platform is available at:
+https://www.socialsciencereproduction.org/reproductions/1783/}}
+\author{Ruoxian Wu}
+\date{April 16, 2024}
+
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\section{Introduction}\label{introduction}
+
+Public health funding significantly impacts public health outcomes,
+particularly during global health emergencies like the COVID-19
+pandemic. In the study ``Women's well-being during a pandemic and its
+containment'' published in the Journal of Development Economics (2022),
+the authors explore the dual crisis of disease and the containment
+policies designed to mitigate its spread, focusing specifically on their
+effects on women in lower-income countries. This paper critically
+analyzes the methodologies and findings of the original study, aiming to
+understand the nuanced impacts of such policies on various aspects of
+women's well-being, including mental health and food security.
+
+In my analysis, I replicate the original study's research using publicly
+available data, extending the investigation to assess how containment
+measures affect the broader socio-economic outcomes beyond what was
+initially reported. Utilizing methodologies such as
+difference-in-differences and regression discontinuity designs, this
+paper evaluates the sensitivity of the findings to different analytical
+approaches. By doing so, it seeks to validate the original results while
+stimulating further discussion on interpreting data to assess public
+health policies' impacts.
+
+This critical analysis endeavors to unravel the complex relationships
+between public health funding, policy effectiveness, and their
+socio-economic ramifications. Through a detailed reexamination of the
+original study's data and methodology, this paper contributes to a more
+comprehensive understanding of how public health initiatives can be
+optimized to better serve vulnerable populations during crises. My
+analysis keeps a keen eye on the societal, economic, and systemic
+factors that shape public health outcomes and the operational dynamics
+of public funding within these contexts.
+
+\section{Data}\label{data}
+
+My reproduction used the programming language R (R Core Team 2022), the
+analysis used the following packages: Haven(Wickham, Miller, and Smith
+2023), Dplyr (Wickham et al. 2023), Ggplot2 (Wickham 2016), Readr
+(Wickham, Hester, and Bryan 2024), Here (Müller 2020), Janitor (Firke
+2023), KableExtra (Zhu 2024), Knitr (Xie 2014), Tidyverse
+(\textbf{rTidyverse?}).
+
+\subsection{Source}\label{source}
+
+This critical analysis utilizes replication data associated with the
+article ``Women's well-being during a pandemic and its containment''
+from the Journal of Development Economics. This data, along with
+associated code, was made accessible by the authors to facilitate the
+replication of key findings such as statistical models and graphical
+representations. By enabling the reproduction of the authors' analyses,
+this data contributes to the transparency and credibility of the study's
+conclusions. The replication package can be find and downloaded after
+requesting access from .
+
+\subsection{Variables}\label{variables}
+
+The data for this study includes both individual-level and
+regional-level variables from six states in rural India.
+Individual-level variables encompass demographic details (age, gender,
+household head status), economic factors (employment status, income
+levels), and health-related outcomes (mental health indicators,
+nutrition data). Regional-level variables cover containment measures,
+healthcare access, and socio-economic indicators such as the prevalence
+of COVID-19, public health infrastructure, and local economic
+conditions.
+
+Regarding data collection, the authors conducted a large phone survey in
+August 2020, targeting households that were first interviewed in the
+fall of 2019, thereby providing a pre-pandemic baseline. This
+longitudinal approach allowed the researchers to examine changes over
+time attributed to the pandemic and containment policies. The survey
+data were supplemented with regional health statistics and COVID-19 case
+data obtained from official public health sources.
+
+The data from the phone survey included detailed questions on mental
+health using validated psychological scales (PHQ9 and GAD7) and food
+security questions adapted from national health surveys. This allowed
+the researchers to construct indices of mental health and nutritional
+status, crucial for evaluating the impact of containment policies on
+women's well-being.
+
+Subsequent to data collection, the data were organized and analyzed
+using statistical software, with the authors employing advanced
+econometric techniques such as difference-in-differences and regression
+discontinuity designs to assess the impact of varying levels of
+containment. This rigorous analytical approach helps to isolate the
+effects of public health interventions from other confounding factors.
+
+\section{Results}\label{results}
+
+\section{Discussion}\label{discussion}
+
+In progress
+
+\section*{Reference}\label{reference}
+\addcontentsline{toc}{section}{Reference}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-rJanitor}
+Firke, Sam. 2023. \emph{Janitor: Simple Tools for Examining and Cleaning
+Dirty Data}. \url{https://github.com/sfirke/janitor}.
+
+\bibitem[\citeproctext]{ref-rHere}
+Müller, Kirill. 2020. \emph{Here: A Simpler Way to Find Your Files}.
+\url{https://here.r-lib.org/}.
+
+\bibitem[\citeproctext]{ref-r}
+R Core Team. 2022. \emph{R: A Language and Environment for Statistical
+Computing}. Vienna, Austria: R Foundation for Statistical Computing.
+\url{https://www.R-project.org/}.
+
+\bibitem[\citeproctext]{ref-rGgplot2}
+Wickham, Hadley. 2016. \emph{Ggplot2: Elegant Graphics for Data
+Analysis}. Springer-Verlag New York.
+\url{https://ggplot2.tidyverse.org}.
+
+\bibitem[\citeproctext]{ref-rDplyr}
+Wickham, Hadley, Romain François, Lionel Henry, Kirill Müller, and Davis
+Vaughan. 2023. \emph{Dplyr: A Grammar of Data Manipulation}.
+\url{https://dplyr.tidyverse.org}.
+
+\bibitem[\citeproctext]{ref-rReadr}
+Wickham, Hadley, Jim Hester, and Jennifer Bryan. 2024. \emph{Readr: Read
+Rectangular Text Data}. \url{https://readr.tidyverse.org}.
+
+\bibitem[\citeproctext]{ref-rHaven}
+Wickham, Hadley, Evan Miller, and Danny Smith. 2023. \emph{Haven: Import
+and Export 'SPSS', 'Stata' and 'SAS' Files}.
+\url{https://haven.tidyverse.org}.
+
+\bibitem[\citeproctext]{ref-rKnitr}
+Xie, Yihui. 2014. {``Knitr: A Comprehensive Tool for Reproducible
+Research in {R}.''} In \emph{Implementing Reproducible Computational
+Research}, edited by Victoria Stodden, Friedrich Leisch, and Roger D.
+Peng. Chapman; Hall/CRC.
+\url{http://www.crcpress.com/product/isbn/9781466561595}.
+
+\bibitem[\citeproctext]{ref-rKableExtra}
+Zhu, Hao. 2024. \emph{kableExtra: Construct Complex Table with 'Kable'
+and Pipe Syntax}. \url{http://haozhu233.github.io/kableExtra/}.
+
+\end{CSLReferences}
+
+
+
+\end{document}

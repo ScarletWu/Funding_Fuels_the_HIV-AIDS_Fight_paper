@@ -21,148 +21,28 @@ In my analysis, I replicate the original study’s research using publicly avail
 This critical analysis endeavors to unravel the complex relationships between public health funding, policy effectiveness, and their socio-economic ramifications. Through a detailed reexamination of the original study’s data and methodology, this paper contributes to a more comprehensive understanding of how public health initiatives can be optimized to better serve vulnerable populations during crises. My analysis keeps a keen eye on the societal, economic, and systemic factors that shape public health outcomes and the operational dynamics of public funding within these contexts.
 
 # Data
-My reproduction used the programming language R [@r], the analysis used the following packages: Haven[@rHaven], Dplyr [@rDplyr], Ggplot2 [@rGgplot2], Readr [@rReadr], Here [@rHere], Janitor [@rJanitor], KableExtra [@rKableExtra], Knitr [@rKnitr], Tidyverse [@rTidyverse].My reproduction seeks to address two findings written in the original paper.
+My reproduction used the programming language R [@r], the analysis used the following packages: Haven[@rHaven], Dplyr [@rDplyr], Ggplot2 [@rGgplot2], Readr [@rReadr], Here [@rHere], Janitor [@rJanitor], KableExtra [@rKableExtra], Knitr [@rKnitr], Tidyverse [@rTidyverse].
+
+
+
 
 ## Source
-The paper used for replication is from American Economic Association, American Economic Review. The replication package is downloaded from . 
+This critical analysis utilizes replication data associated with the article "Women’s well-being during a pandemic and its containment" from the Journal of Development Economics. This data, along with associated code, was made accessible by the authors to facilitate the replication of key findings such as statistical models and graphical representations. By enabling the reproduction of the authors' analyses, this data contributes to the transparency and credibility of the study's conclusions.
+The replication package can be find and downloaded after requesting access from . 
 
 ## Variables
 
+The data for this study includes both individual-level and regional-level variables from six states in rural India. Individual-level variables encompass demographic details (age, gender, household head status), economic factors (employment status, income levels), and health-related outcomes (mental health indicators, nutrition data). Regional-level variables cover containment measures, healthcare access, and socio-economic indicators such as the prevalence of COVID-19, public health infrastructure, and local economic conditions.
+
+Regarding data collection, the authors conducted a large phone survey in August 2020, targeting households that were first interviewed in the fall of 2019, thereby providing a pre-pandemic baseline. This longitudinal approach allowed the researchers to examine changes over time attributed to the pandemic and containment policies. The survey data were supplemented with regional health statistics and COVID-19 case data obtained from official public health sources.
+
+The data from the phone survey included detailed questions on mental health using validated psychological scales (PHQ9 and GAD7) and food security questions adapted from national health surveys. This allowed the researchers to construct indices of mental health and nutritional status, crucial for evaluating the impact of containment policies on women’s well-being.
+
+Subsequent to data collection, the data were organized and analyzed using statistical software, with the authors employing advanced econometric techniques such as difference-in-differences and regression discontinuity designs to assess the impact of varying levels of containment. This rigorous analytical approach helps to isolate the effects of public health interventions from other confounding factors.
 
 # Results
 
-```{r}
-#| message: false
-#| echo: false
-# Install packages we need
-library(plm)
-library(lmtest)
-library(sandwich)
-library(stargazer)
-library(glmnet)
-library(dplyr)
-library(haven)
-library(readstata13)
 
-# Set file paths
-data_path <- "/cloud/project/data/raw_data/"
-data_file <- paste0(data_path, "covid_gender_data.dta")
-
-data <- read_dta(data_file)
-```
-
-```{r}
-library(knitr)
-library(kableExtra)
-
-# Create a data frame that mimics the structure of the table in the uploaded image
-data <- data.frame(
-  Containment = c("0.242** (0.113)", "0.233*** (0.0698)", "0.361* (0.178)", "0.363*** (0.120)", 
-                  "0.259 (0.156)", "0.237*** (0.0718)", "0.287* (0.141)", "0.276*** (0.0720)", 
-                  "0.149 (0.150)", "0.127 (0.128)"),
-  `Past Containment Controls` = rep("Yes", 10),
-  `State FE` = rep("Yes", 10),
-  `Age FE` = rep("Yes", 10),
-  `Lasso Controls` = c(rep("No", 5), rep("Yes", 5)),
-  `Case and Death Controls` = c(rep("No", 7), "Yes", "No", "Yes"),
-  `Dep Var. Mean` = c(rep("0.344", 2), rep("0.276", 2), "0.301", "0.301", "0.307", "0.307", "0.299", "0.299"),
-  `Adjusted R-squared` = c("0.009", "0.027", "0.022", "0.056", "0.023", "0.052", "0.021", "0.059", "0.006", "0.026"),
-  Observations = rep("489", 10)
-)
-
-# Transpose the data frame to get the desired layout
-transposed_data <- t(data)
-colnames(transposed_data) <- c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
-          "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations")
-
-# Generate the kable table with rotated row headers
-kable_output <- kable(transposed_data, "html", booktabs = TRUE, escape = FALSE, align = 'c') %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "center") %>%
-  row_spec(0, angle = 90, valign = "top") %>%
-  add_header_above(c(" " = 1, "More Depressed" = 2, "More Exhausted" = 2, "More Anxious" = 2, "MH Index" = 2, "Less Safe" = 2)) %>%
-  column_spec(1, bold = TRUE)
-
-# Print the kable table
-kable_output
-
-
-```
-```{r}
-library(knitr)
-library(kableExtra)
-
-# Create a data frame that mimics the structure of the table in the uploaded image
-data <- data.frame(
-  ` ` = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
-          "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations"),
-  X1 = c("0.242** (0.113)", "Yes", "Yes", "Yes", "No", "No", "0.344", "0.009", "489"),
-  X2 = c("0.233*** (0.0698)", "Yes", "Yes", "Yes", "Yes", "No", "0.344", "0.027", "489"),
-  X3 = c("0.361* (0.178)", "Yes", "Yes", "Yes", "No", "No", "0.276", "0.022", "489"),
-  X4 = c("0.363*** (0.120)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.276", "0.056", "489"),
-  X5 = c("0.259 (0.156)", "Yes", "Yes", "Yes", "No", "No", "0.301", "0.023", "489"),
-  X6 = c("0.237*** (0.0718)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.301", "0.052", "489"),
-  X7 = c("0.287* (0.141)", "Yes", "Yes", "Yes", "No", "No", "0.307", "0.021", "489"),
-  X8 = c("0.276*** (0.0720)", "Yes", "Yes", "Yes", "Yes", "No", "0.307", "0.059", "489"),
-  X9 = c("0.149 (0.150)", "Yes", "Yes", "Yes", "No", "No", "0.299", "0.006", "489"),
-  X10 = c("0.127 (0.128)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.299", "0.026", "489")
-)
-
-# Transpose the data frame to get the desired layout
-transposed_data <- t(data)
-colnames(transposed_data) <- transposed_data[1, ]
-transposed_data <- transposed_data[-1, ]
-
-# Generate the kable table
-kable_output <- kable(transposed_data, caption = "Table 1\nRelationship between Containment and Female Well-being.",
-                      booktabs = TRUE, escape = FALSE) %>%
-  kable_styling(full_width = FALSE, position = "center", font_size = 12) %>%
-  column_spec(1, bold = TRUE, border_right = TRUE) %>%
-  add_header_above(c(" " = 1, "More Depressed" = 1, "More Exhausted" = 1, "More Anxious" = 1, "MH Index" = 1, "Less Safe" = 5))
-
-kable_output
-
-
-```
-```{r}
-library(knitr)
-library(kableExtra)
-
-# Create a data frame that mimics the structure of the table in the uploaded image
-data <- data.frame(
-  ` ` = c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
-          "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations"),
-  X1 = c("0.242** (0.113)", "Yes", "Yes", "Yes", "No", "No", "0.344", "0.009", "489"),
-  X2 = c("0.233*** (0.0698)", "Yes", "Yes", "Yes", "Yes", "No", "0.344", "0.027", "489"),
-  X3 = c("0.361* (0.178)", "Yes", "Yes", "Yes", "No", "No", "0.276", "0.022", "489"),
-  X4 = c("0.363*** (0.120)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.276", "0.056", "489"),
-  X5 = c("0.259 (0.156)", "Yes", "Yes", "Yes", "No", "No", "0.301", "0.023", "489"),
-  X6 = c("0.237*** (0.0718)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.301", "0.052", "489"),
-  X7 = c("0.287* (0.141)", "Yes", "Yes", "Yes", "No", "No", "0.307", "0.021", "489"),
-  X8 = c("0.276*** (0.0720)", "Yes", "Yes", "Yes", "Yes", "No", "0.307", "0.059", "489"),
-  X9 = c("0.149 (0.150)", "Yes", "Yes", "Yes", "No", "No", "0.299", "0.006", "489"),
-  X10 = c("0.127 (0.128)", "Yes", "Yes", "Yes", "Yes", "Yes", "0.299", "0.026", "489")
-)
-
-row_headers <- c("Containment", "Past Containment Controls", "State FE", "Age FE", "Lasso Controls", 
-                 "Case and Death Controls", "Dep Var. Mean", "Adjusted R-squared", "Observations")
-
-transposed_data <- as.data.frame(t(data[-1])) # Exclude the first column which has the headers
-# Now set the names of the data frame based on the first column of 'data'
-names(transposed_data) <- data$Header
-
-# We don't set row names here, because after transposition, they are the column headers
-# If you want to rotate the headers, that would be done in the PDF or HTML output, not in the data frame itself
-
-# Create the kable, assuming it's going to be an HTML table
-kable_output <- kable(transposed_data, format = "html", escape = FALSE) %>%
-  kable_styling(full_width = FALSE, position = "center") %>%
-  add_header_above(c(" " = 1, "More Depressed" = 1, "More Exhausted" = 1, "More Anxious" = 1, 
-                     "MH Index" = 1, "Less Safe" = 5)) # Adjust the span to match the structure of your table
-
-# Print the kable table
-kable_output
-```
-###
 
 # Discussion
 In progress
