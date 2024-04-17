@@ -2,11 +2,19 @@
 library(MASS)
 
 # Data simulation based on original data structure
-simulated_data <- as.data.frame(mvrnorm(n = nrow(data_filtered), mu = colMeans(data_filtered[, predictors, drop = FALSE]), Sigma = cov(data_filtered[, predictors, drop = FALSE])))
-colnames(simulated_data) <- predictors
+# Identify numeric columns
+numeric_columns <- sapply(data_filtered[, predictors, drop = FALSE], is.numeric)
 
-# Add noise to the data
-simulated_data <- mutate(simulated_data, tran_inc_normal = tran_inc_normal + rnorm(n(), mean = 0, sd = sd(data$tran_inc_normal)))
+# Filter numeric columns
+numeric_data <- data_filtered[, predictors, drop = FALSE][, numeric_columns]
+
+# Calculate mean and covariance
+mu <- colMeans(numeric_data)
+sigma <- cov(numeric_data)
+
+# Generate simulated data
+simulated_data <- as.data.frame(mvrnorm(n = nrow(data_filtered), mu = mu, Sigma = sigma))
+
 
 # Saving the simulated dataset
-write.csv(simulated_data, "/cloud/project/data/simulated_data.csv", row.names = FALSE)
+write.csv(simulated_data, "/cloud/project/data/cleaned/simulated_data.csv", row.names = FALSE)
