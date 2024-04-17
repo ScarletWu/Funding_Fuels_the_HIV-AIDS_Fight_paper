@@ -1,18 +1,20 @@
-# Funding_Fuels_the_HIV-AIDS_Fight
+# Tracing Hidden Struggles of Rural Indian Women During Pandemic
 
 ## Overview
-This repo replicated data from "Evidence and Lessons on the Health Impacts of Public Health Funding from the Fight against HIV/AIDS". This study explores the effectiveness of the Ryan White CARE Act in the US government's fight against HIV/AIDS. By examining the federal funding allocated to combat the disease, the research assesses how these financial efforts have contributed to addressing the crisis and highlights the role of funding disparities in shaping the national response to HIV/AIDS.
+This repo replicated data from "Women’s Well-being during a Pandemic and its containment". It focuses on how COVID-19 and its containment policies affect women in lower-income countries. It uses publicly available data and methods like difference-in-differences to validate the original findings and further explores how these policies influence broader socio-economic outcomes. 
 
 
 ## LLM Usage
-LLM's like ChatGPT have been used for code explanation, error explanations and fixes. The chat can be found in LLM/llm.txt.
+LLMs like ChatGPT have been used for code explanation, error explanations, and fixes. The chat history can be found in LLM/llm.txt.
 
 ## File Structure
 The repo is structured as:
 
 -   `data` contains the data sources used in analysis including the raw data.
 -   `data/cleaned` contains the cleaned dataset that was constructed.
--   `outputs` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper. 
--   `outputs/model` contains the saved models
--   `outputs/sketch` contains the schetches of dataset and models
+-   `Outputs` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper.
+-   `Outputs/figures` contains all figures saved in png format used to generate the paper.
+-   `Outputs/tables` contains all tables saved and used to generate the paper.
+-   `model` contains the saved models.
+-   `outputs/sketch` contains the schetches of dataset and models.
 -   `scripts` contains the R scripts used to simulate, download and clean data.
