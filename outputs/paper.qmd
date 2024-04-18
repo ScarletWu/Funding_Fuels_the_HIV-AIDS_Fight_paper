@@ -15,13 +15,11 @@ bibliography: references.bib
 
 Public health funding significantly impacts public health outcomes, especially during global health emergencies like the COVID-19 pandemic. The study "Women’s Well-being during a Pandemic and its Containment," published in the Journal of Development Economics (2022), examines the effects of disease and containment policies on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study.
 
-I obtained the data from the original author to replicate the study. Using methodologies, including fixed-effect analysis and regression models, this paper evaluates the sensitivity of the findings to different analytical approaches. It aims to validate the original results and stimulate further discussion on interpreting data to assess the impacts of public health policies.
-
-This critical analysis aims to clarify the complex relationships between public health funding, policy effectiveness, and their socio-economic effects. By reexamining the original study’s data and methodology, this paper contributes to understanding how public health initiatives can be optimized to serve vulnerable populations during crises.
+I obtained the data from the original author to replicate the study. Using methodologies, including fixed-effect analysis and regression models, this paper evaluates the sensitivity of the findings to different analytical approaches. This critical analysis aims to clarify the complex relationships between public health funding, policy effectiveness, and their socio-economic effects. By re-examining the original study’s data and methodology, this paper contributes to understanding how public health initiatives can be optimized to serve vulnerable populations during crises.
 
 # Data
 ## Tools
-My replication employed R [@r] along with several essential packages for data manipulation and visualization. Specifically, I utilized Haven [@rHaven] for importing and exporting data, Dplyr [@rDplyr] for data manipulation, Ggplot2 [@rGgplot2] for creating visualizations, Readr [@rReadr] for reading rectangular text data, Here [@rHere] for managing file paths, Janitor [@rJanitor] for examining and cleaning data, KableExtra [@rKableExtra] for constructing complex tables, Knitr [@rKnitr] for dynamic report generation, and Tidyverse [@rTidyverse] for a cohesive data science workflow. Additionally, I employed Coefplot [@rCoefplot] for visualizing regression coefficients and Broom [@rBroom], Lmtest [@rLmtest], and Sandwich [@rSandwich] for regression diagnostics and robust standard errors. For advanced modeling techniques, I utilized Glmnet [@rGlmnet] for Lasso regression.
+My replication employed R [@r] along with several essential packages for data manipulation and visualization. Specifically, I utilized Haven [@haven] for importing and exporting data, Dplyr [@dplyr] for data manipulation, Ggplot2 [@ggplot2] for creating visualizations, Readr [@readr] for reading rectangular text data, Here [@here] for managing file paths, Janitor [@rJanitor] for examining and cleaning data, KableExtra [@kableExtra] for constructing complex tables, Knitr [@knitr] for dynamic report generation, and Tidyverse [@tidyverse] for a cohesive data science workflow. Additionally, I employed Coefplot [@rCoefplot] for visualizing regression coefficients and Broom [@broom], Lmtest [@lmtest], and Sandwich [@sandwich] for regression diagnostics and robust standard errors. For advanced modeling techniques, I utilized Glmnet [@glmnet] for Lasso regression.
 
 ## Source
 
@@ -98,6 +96,8 @@ data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
 #| label: fig-1
 #| fig-cap: "Impact of general economic disruptions on income and women's welfare."
 #| echo: false
+#| warning: false
+#| message: false
 #| layout-ncol: 2
 #| fig-subcap: ["Distributions of Transformed Income", "Effect of COVID-19 on Various Outcomes"]
 
@@ -242,6 +242,158 @@ The results depicted in the figure provide valuable insights into the relative i
 
 ## Mental Health Deterioration
 The study documents a significant deterioration in mental health among the surveyed women, with increases in reported depression, exhaustion, and anxiety. These findings align with broader literature indicating that women, particularly in lower-income settings, bear a disproportionate burden of mental health challenges during crises.
+
+
+```{r}
+#| label: fig-3
+#| fig-cap: "Relationship between Containment and Female Well-being or Socioeconomic and Nutritional Outcomes."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-subcap: ["Effect Sizes of Predictors in Mental Health Models", "Effect Sizes of Predictors in Economic and Nutritional Impact Models"]
+
+# Set the data path and read the data
+data_path <- "/cloud/project/data/cleaned/"
+data_file <- paste0(data_path, "Filtered_Covid_Gender_Data.csv")
+data <- read.csv(data_file)
+
+data$demo_caste <- as.character(data$demo_caste)
+
+
+# Prepare data: factor conversion and recoding
+prepare_data <- function(data) {
+  data %>%
+    mutate(across(c(geo_state, color_zone, demo_caste, demo_religion, fem_marital_status), as.factor),
+           demo_caste = factor(recode(as.character(demo_caste), '99' = NA)),
+           demo_religion = factor(recode(as.character(demo_religion), '99' = NA)),
+           fem_marital_status = factor(recode(as.character(fem_marital_status), '99' = NA)))
+}
+
+data <- prepare_data(data)
+
+# Filter data to exclude missing data on necessary variables
+filter_data <- function(data, variables) {
+  data %>%
+    filter(complete.cases(data[, variables])) %>%
+    filter(final_status %in% c("1", "2"))
+}
+
+# Define general predictors and response variables
+general_predictors <- c("cases_per_100000", "deaths_per_100000", "dist_prop_covid_zone", 
+                        "red_zone", "orange_zone", "tran_inc_normal", "asset_index")
+response_vars <- c("ind_fem_depression_change", "ind_fem_tired_change",
+                   "ind_fem_worried_change", "ind_fem_safety_change", "mental_index_change")
+
+data2t <- filter_data(data, c(response_vars, general_predictors, "geo_district"))
+
+rename_vars <- c(
+  ind_fem_depression_change = "More Depressed",
+  ind_fem_tired_change = "More Tired",
+  ind_fem_worried_change = "More Worried",
+  ind_fem_safety_change = "Feel Less Safe",
+  mental_index_change = "Mental Health Index Change",
+  hh_num_inc_reduced = "Household Income Reduced",
+  ind_meals_reduced = "Meals Reduced",
+  newf_index = "New Financial Index",
+  newm_index = "New Mental Health Index",
+  cases_per_100000 = "Cases per 100,000",
+  deaths_per_100000 = "Deaths per 100,000",
+  dist_prop_covid_zone = "District Proportion in Covid Zone",
+  red_zone = "Red Zone",
+  orange_zone = "Orange Zone",
+  tran_inc_normal = "Transition Income Normal",
+  asset_index = "Asset Index",
+  hh_num_inc_reduced_with_lasso = "Household Income Reduced with LASSO",
+  hh_num_inc_reduced_without_lasso = "Household Income Reduced without LASSO",
+  ind_meals_reduced_with_lasso = "Meals Reduced with LASSO",
+  ind_meals_reduced_without_lasso = "Meals Reduced without LASSO",
+  newf_index_with_lasso = "New Financial Index with LASSO",
+  newf_index_without_lasso = "New Financial Index without LASSO",
+  newm_index_with_lasso = "New Mental Health Index with LASSO",
+  newm_index_without_lasso = "New Mental Health Index without LASSO"
+)
+
+# Use the updated map in the summarize_models function
+summarize_models <- function(models) {
+  bind_rows(
+    lapply(names(models), function(model_name) {
+      model_data <- tidy(models[[model_name]])
+      model_data$model <- rename_vars[model_name] %>% coalesce(model_name)  # Rename the model name
+      model_data$term <- rename_vars[model_data$term] %>% coalesce(model_data$term)  # Rename the terms
+      return(model_data)
+    }),
+    .id = "model_id"
+  ) %>%
+    filter(term != "(Intercept)")
+}
+
+# Model fitting functions
+fit_models <- function(data, response_vars, predictors) {
+  models <- list()
+  for (response in response_vars) {
+    formula <- as.formula(paste(response, "~", paste(predictors, collapse = " + ")))
+    model <- glm(formula, family = binomial(), data = data)
+    models[[response]] <- model
+  }
+  return(models)
+}
+
+# Fit models for first set of variables
+models_response <- fit_models(data2t, response_vars, general_predictors)
+
+# Second set of variables of interest
+variables_of_interest <- c("hh_num_inc_reduced", "ind_meals_reduced", "newf_index", "newm_index")
+data2t_vars_interest <- filter_data(data, c(variables_of_interest, general_predictors, "geo_district"))
+
+fit_felm_models <- function(data, variables_of_interest, lasso_vars, other_vars) {
+  results <- list()
+  for (var in variables_of_interest) {
+    formula1 <- as.formula(paste0(var, " ~ ", paste(other_vars, collapse = "+"), " | 0 | 0 | geo_district"))
+    formula2 <- as.formula(paste0(var, " ~ ", paste(c(other_vars, lasso_vars), collapse = "+"), "| 0 | 0 | geo_district"))
+    model1 <- felm(formula1, data = data)
+    model2 <- felm(formula2, data = data)
+    results[[paste0(var, "_without_lasso")]] <- model1
+    results[[paste0(var, "_with_lasso")]] <- model2
+  }
+  return(results)
+}
+
+# Fit models for second set of variables
+results_vars_interest <- fit_felm_models(data2t_vars_interest, variables_of_interest, general_predictors, c("dist_prop_covid_zone", "red_zone", "orange_zone"))
+
+# Plotting functions
+plot_coefficients_logistic <- function(results) {
+  ggplot(results, aes(x = term, y = estimate, color = model)) +
+    geom_point(position = position_dodge(width = 0.5)) +
+    geom_errorbar(aes(ymin = estimate - std.error, ymax = estimate + std.error), width = 0.2, position = position_dodge(width = 0.5)) +
+    coord_flip() +
+    labs(x = "Predictors", y = "Estimated Coefficients") +
+    theme_minimal() +
+    theme(legend.title = element_blank(),
+          legend.position = "bottom")
+}
+
+plot_coefficients_felm <- function(results) {
+  ggplot(results, aes(x = term, y = estimate, color = model)) +
+    geom_point(position = position_dodge(width = 0.5)) +
+    geom_errorbar(aes(ymin = estimate - std.error, ymax = estimate + std.error), width = 0.2, position = position_dodge(width = 0.5)) +
+    coord_flip() +
+    labs(x = "Predictors", y = "Estimated Coefficients") +
+    theme_minimal() +
+    theme(legend.title = element_blank(),
+          legend.position = "bottom")
+}
+
+# Generate and display plots
+results_logistic <- summarize_models(models_response)
+plot_logistic <- plot_coefficients_logistic(results_logistic)
+print(plot_logistic)
+
+results_felm <- summarize_models(results_vars_interest)
+plot_felm <- plot_coefficients_felm(results_felm)
+print(plot_felm)
+```
+
 
 ## Economic and Nutritional Impact
 Economically, the pandemic led to dramatic income losses and heightened food insecurity, with the latter particularly pronounced among women. The findings suggest that containment measures, while necessary for public health, inadvertently exacerbated these issues, underscoring the need for targeted support measures.

@@ -1,0 +1,80 @@
+---
+title: "Datasheet for Indian women's well-being"
+author: 
+  - Natalie Gaurav Khanna, Corinne Low, Manisha Shah, Sreyashi Sharmin, and Alessandra Voena
+thanks: "Code and data are available at: https://datasets.iza.org/dataset/1395/g2lm-lic-women-s-well-being-during-a-pandemic-and-its-containment. "
+date: "2 April 2024"
+date-format: "D MMMM YYYY"
+abstract: "This datasheet provides detailed information about the dataset for Women’s well-being during a pandemic and its containment."
+format: pdf
+number-sections: true
+---
+Programs for “Women’s Well-Being During a Pandemic and Its Containment”
+
+
+
+What do the instances that comprise the dataset represent?
+
+Each instance in the dataset represents individual responses from a COVID-19 phone survey, capturing detailed socio-economic and health-related data from women heads of households across Northern India.
+
+
+How many instances are there in total?
+
+The dataset contains over 1,000 instances, each corresponding to a surveyed individual.
+
+
+What data does each instance consist of?
+
+Each instance includes data on employment status, mental health indicators, nutritional outcomes, and demographic details such as age, education, and household size.
+
+
+Is there a label or target associated with each instance?
+
+The dataset does not have a specific label or target; it's primarily used for observational and analytical studies on the impacts of the pandemic.
+
+
+Is any information missing from individual instances?
+
+Some instances may have missing data due to non-responses or skipped questions in the survey process.
+Collection Process
+
+
+How was the data associated with each instance acquired?
+
+The data was collected through telephone interviews conducted by trained personnel from IDInsight, ensuring comprehensive coverage despite lockdown restrictions.
+
+
+What mechanisms or procedures were used to collect the data?
+
+Standardized questionnaires were administered, with procedures in place to ensure the reliability and consistency of the data collected across different interviewers and respondents.
+Preprocessing/Cleaning/Labeling
+
+
+Was any preprocessing/cleaning/labeling of the data done?
+
+Preprocessing involved cleaning for inconsistencies, handling missing values, and verifying the accuracy of responses. Data was anonymized to protect the identities of the respondents.
+
+# Uses
+
+Has the dataset been used for any tasks already?
+
+The dataset has been extensively used to analyze the impact of COVID-19 containment measures on women's employment, mental health, and nutritional status, resulting in several academic publications and policy reports.
+
+
+What other tasks could the dataset be used for?
+
+Beyond its current use, the dataset could inform longitudinal studies on long-term impacts of the pandemic, contribute to comparative studies with other regions, and aid in developing targeted interventions for women in similar crises.
+
+
+# Distribution
+
+Will the dataset be distributed to third parties?
+
+Yes, the dataset is available for non-commercial use to facilitate further research and policy planning, provided proper attribution is given as per the licensing agreement.
+
+
+# Maintenance
+
+Who will be supporting/hosting/maintaining the dataset?
+
+The dataset will be maintained by the IZA Data Repository.
