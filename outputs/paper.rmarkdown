@@ -14,15 +14,15 @@ bibliography: references.bib
 
 # Introduction
 
-Public health funding significantly impacts public health outcomes, particularly during global health emergencies like the COVID-19 pandemic. In the study "Women’s well-being during a pandemic and its containment" published in the Journal of Development Economics (2022), the authors explore the dual crisis of disease and the containment policies designed to mitigate its spread, focusing specifically on their effects on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study.
+Public health funding significantly impacts public health outcomes, especially during global health emergencies like the COVID-19 pandemic. The study "Women’s Well-being during a Pandemic and its Containment," published in the Journal of Development Economics (2022), examines the effects of disease and containment policies on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study.
 
-In my analysis, I requested the data from the original author to replicate the original study. Utilizing methodologies such as difference-in-differences and regression discontinuity designs, this paper evaluates the sensitivity of the findings to different analytical approaches. By doing so, it seeks to validate the original results while stimulating further discussion on interpreting data to assess public health policies' impacts.
+I obtained the data from the original author to replicate the study. Using methodologies, including fixed-effect analysis and regression models, this paper evaluates the sensitivity of the findings to different analytical approaches. It aims to validate the original results and stimulate further discussion on interpreting data to assess the impacts of public health policies.
 
-This critical analysis endeavors to unravel the complex relationships between public health funding, policy effectiveness, and their socio-economic ramifications. Through a detailed reexamination of the original study’s data and methodology, this paper contributes to a more comprehensive understanding of how public health initiatives can be optimized to better serve vulnerable populations during crises. 
+This critical analysis aims to clarify the complex relationships between public health funding, policy effectiveness, and their socio-economic effects. By reexamining the original study’s data and methodology, this paper contributes to understanding how public health initiatives can be optimized to serve vulnerable populations during crises.
 
 # Data
 ## Tools
-My reproduction used the programming language R [@r], the analysis used the following packages: Haven[@rHaven], Dplyr [@rDplyr], Ggplot2 [@rGgplot2], Readr [@rReadr], Here [@rHere], Janitor [@rJanitor], KableExtra [@rKableExtra], Knitr [@rKnitr], Tidyverse [@rTidyverse].
+My replication employed R [@r] along with several essential packages for data manipulation and visualization. Specifically, I utilized Haven [@rHaven] for importing and exporting data, Dplyr [@rDplyr] for data manipulation, Ggplot2 [@rGgplot2] for creating visualizations, Readr [@rReadr] for reading rectangular text data, Here [@rHere] for managing file paths, Janitor [@rJanitor] for examining and cleaning data, KableExtra [@rKableExtra] for constructing complex tables, Knitr [@rKnitr] for dynamic report generation, and Tidyverse [@rTidyverse] for a cohesive data science workflow. Additionally, I employed Coefplot [@rCoefplot] for visualizing regression coefficients and Broom [@rBroom], Lmtest [@rLmtest], and Sandwich [@rSandwich] for regression diagnostics and robust standard errors. For advanced modeling techniques, I utilized Glmnet [@rGlmnet] for Lasso regression.
 
 ## Source
 
@@ -40,23 +40,23 @@ Subsequent to data collection, the data were organized and analyzed using statis
 # Model
 Different models were used to evaluate diffrent factors to Indian women's well-being during the pandemic.
 
-We employ a regression model to assess the impact of district-level containment measures on individual outcomes, considering age, state, and district variables. Our outcome of interest reflects various personal experiences, with containment representing the intensity of policy measures in one's district.
+I employ a regression model to assess the impact of district-level containment measures on individual outcomes, considering age, state, and district variables. Myoutcome of interest reflects various personal experiences, with containment representing the intensity of policy measures in one's district.
 
-The model accounts for age and state as non-varying influences, along with controls for local COVID-19 severity and pre-pandemic socioeconomic factors to mitigate potential confounding effects. We ensure a consistent sample across studies by including only individuals with complete control data.
+The model accounts for age and state as non-varying influences, along with controls for local COVID-19 severity and pre-pandemic socioeconomic factors to mitigate potential confounding effects. I ensure a consistent sample across studies by including only individuals with complete control data.
 
 $$
 y_{iasd} = \beta \text{containment}_d + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
 $$
 
 
-Additionally, we probe the robustness of our findings against possible biases in self-reported mental health changes by comparing them with general mental health inquiries that do not reference the pandemic timeframe.
+Additionally, I probe the robustness of my findings against possible biases in self-reported mental health changes by comparing them with general mental health inquiries that do not reference the pandemic timeframe.
 
 $$
 y_{iasd} = \beta_1 \text{has\_son}_i + \beta_2 \text{has\_daughter}_i + \beta_3 \text{female\_headed}_i + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
 $$
 
 
-In a related analysis, we explore how the presence of sons or daughters and female-headed households correlate with individual well-being, applying the same control variables and fixed effects as in the initial model.
+In a related analysis, I explore how the presence of sons or daughters and female-headed households correlate with individual well-being, applying the same control variables and fixed effects as in the initial model.
 
 
 
@@ -79,47 +79,7 @@ library(glmnet)
 library(caret)
 ```
 
-```{r}
 
-data <- mutate(data,
-               across(c(geo_state, color_zone, demo_caste, demo_religion, fem_marital_status), as.factor))
-
-# Recoding '99' to NA for relevant factor variables
-data$demo_caste <- as.character(data$demo_caste)  # Convert to character to manipulate
-data$demo_caste[data$demo_caste == "99"] <- NA    # Change '99' to NA
-data$demo_caste <- factor(data$demo_caste)        # Convert back to factor
-
-data$demo_religion <- as.character(data$demo_religion)
-data$demo_religion[data$demo_religion == "99"] <- NA
-data$demo_religion <- factor(data$demo_religion)
-
-data$fem_marital_status <- as.character(data$fem_marital_status)
-data$fem_marital_status[data$fem_marital_status == "99"] <- NA
-data$fem_marital_status <- factor(data$fem_marital_status)
-
-necessary_columns <- c(response_vars, predictors)
-data <- data[complete.cases(data[necessary_columns]), ]
-cat("Rows after removing rows with NA in necessary columns:", nrow(data), "\n")
-
-# Handling NA values in key factor variables
-
-response_vars <- c("ind_fem_depression_change", "ind_fem_tired_change",
-                   "ind_fem_worried_change", "ind_fem_safety_change", "mental_index_change")
-
-predictors <- c("cases_per_100000", "deaths_per_100000", "dist_prop_covid_zone", 
-                "red_zone", "orange_zone", "tran_inc_normal", "asset_index")
-
-# Create an empty list to store models
-models <- list()
-
-# Loop through each response variable and fit a logistic regression model
-for (response in response_vars) {
-  formula <- as.formula(paste(response, "~", paste(predictors, collapse = " + ")))
-  model <- glm(formula, family = binomial(), data = data)
-  models[[response]] <- model
-}
-
-```
 
 
 # Results
@@ -148,7 +108,7 @@ data$geo_state <- as.factor(data$geo_state)
 data$geo_district <- as.factor(data$geo_district)
 data$final_status <- as.factor(data$final_status)
 
-# To avoid the warning, make sure you filter out NA and infinite values from your income variables
+
 data <- data %>%
   filter(!is.na(tran_inc_normal), !is.infinite(tran_inc_normal),
          !is.na(tran_inc_current), !is.infinite(tran_inc_current))
@@ -211,20 +171,19 @@ p1a
 coef_plot
 ```
 
-@fig1-1 presents a histogram comparing the distribution of normal monthly income to income during the COVID-19 period, transformed using the inverse hyperbolic sine (IHS), which helps to linearize the data and deal with non-negative income values. The two distributions allow for a visual assessment of the shift in income levels due to the pandemic.
+@fig-1-1 presents a histogram comparing the distribution of normal monthly income to income during the COVID-19 period, transformed using the inverse hyperbolic sine (IHS), which helps to linearize the data and deal with non-negative income values. The two distributions allow for a visual assessment of the shift in income levels due to the pandemic.
 
-@fig1-2 is a dot plot with error bars that showcase the proportion of households experiencing various outcomes due to the pandemic. These outcomes include lost income, reduced meals, and changes in mental health status such as increased depression, anxiety, exhaustion, and feelings of safety. Each point represents the mean value for the outcome, with the bars indicating the confidence intervals, providing a clear indication of the pandemic's impact on these factors.
+@fig-1-2 is a dot plot with error bars that showcase the proportion of households experiencing various outcomes due to the pandemic. These outcomes include lost income, reduced meals, and changes in mental health status such as increased depression, anxiety, exhaustion, and feelings of safety. Each point represents the mean value for the outcome, with the bars indicating the confidence intervals, providing a clear indication of the pandemic's impact on these factors.
 
 
 ```{r}
-# figure 2
 #| label: fig-2
-#| fig-cap: "Impact of general economic disruptions on income and women's welfare."
+#| fig-cap: ""
 #| echo: false
 #| warning: false
 #| message: false
 #| layout-ncol: 2
-
+#| fig-subcap: ["Scatter Plot of More Depressed", "Scatter Plot of More Exhausted", "Scatter Plot of More Anxious", "Scatter Plot of Less Safe", "Scatter Plot of Reduced Meals", "Scatter Plot of Individual Lost Income"]
 
 data2 <- data %>%
   filter(final_status %in% c("1", "2")) %>% 
@@ -261,8 +220,7 @@ for (var in outcome_vars) {
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     annotate("text", x = Inf, y = Inf, label = paste0("Beta: ", round(beta, 3), "\nSE: ", round(se, 3)), 
              hjust = 1.05, vjust = 1.05, size = 3.5, color = "black") +
-    labs(title = paste("Scatter Plot of", var, "vs. Containment"),
-         x = "Containment", y = var) +
+    labs(x = "Containment", y = var) +
     theme_minimal() +
     theme(legend.position = "none", plot.title = element_text(hjust = 0.5), 
           plot.background = element_rect(fill = "white"),
@@ -282,11 +240,11 @@ for (var in outcome_vars) {
 ```
 
 
-@fig-2 are scatter plots that relate the containment measures to different outcomes, including anxiety, depression, exhaustion, lost income, reduced meals, and safety. The plots typically have the containment intensity on the x-axis and the outcome variable on the y-axis. The line represents the best-fit linear relationship between containment and the specific outcome. The slope coefficient (Beta) and its standard error (SE) are usually annotated on the plot, quantifying the association between containment policies and the outcomes, with higher values indicating a stronger relationship.
+Figure 2 illustrates scatter plots that relate the containment measures to different outcomes, including anxiety, depression, exhaustion, lost income, reduced meals, and safety. The plots typically have the containment intensity on the x-axis and the outcome variable on the y-axis. The line represents the best-fit linear relationship between containment and the specific outcome.  In these analyses, a regression coefficient (β) is used to measure the strength and direction of the relationship, accompanied by standard errors (SE) to indicate the precision of these estimates. As containment measures become more stringent , individuals report increasing levels of depression (β = 0.295, @fig-2-1), exhaustion (β = 0.504,  @fig-2-2), and anxiety (β = 0.332,  @fig-2-3), alongside a decreased sense of safety (β = 0.282, @fig-2-4). Additionally, there is a notable reduction in meal frequency (β = 1.15, @fig-2-5) and an increase in the loss of individual income (β = 0.065, @fig-2-6) associated with stricter containment policies. These β values are all positive, indicating a direct correlation with containment levels, and the SE values (in parentheses) reflect the variability of the estimates within the clusters of districts.
 
 
 
-The analysis reveals significant impacts of the COVID-19 pandemic on women's well-being in rural India. Specifically, moving from zero to average containment levels is associated with a 38% increase in the likelihood of women reporting more depression, a 73% increase in reporting more exhaustion, and a 44% increase in reporting more anxiety. These effects are further magnified among women with daughters and those living in female-headed households, underscoring the compounded vulnerabilities these groups face.
+The results depicted in the figure provide valuable insights into the relative importance of predictor variables across different models. By visually presenting the estimated coefficients and their confidence intervals, this plot offers a clear and direct interpretation of the model results. Unlike the original paper, which relied on tables to illustrate the model results, this coefficient figure provides a more intuitive and easy-to-understand representation. The prominence of certain predictor variables, as indicated by larger effect sizes and narrower confidence intervals, suggests their stronger associations with the outcomes of interest. These findings have important implications for understanding the drivers of the observed outcomes and can inform targeted interventions and policy decisions. Overall, the use of this coefficient figure enhances the accessibility and comprehensibility of the model results, facilitating informed decision-making and further research endeavors.
 
 ## Mental Health Deterioration
 The study documents a significant deterioration in mental health among the surveyed women, with increases in reported depression, exhaustion, and anxiety. These findings align with broader literature indicating that women, particularly in lower-income settings, bear a disproportionate burden of mental health challenges during crises.
@@ -297,23 +255,18 @@ Economically, the pandemic led to dramatic income losses and heightened food ins
 
 # Discussion
 ## Socioeconomic Strain and Mental Health
-The data suggest that the socioeconomic strains induced by the pandemic—compounded by containment measures—have had a profound impact on women's mental health. These findings are critical, given the limited social safety nets available in many parts of rural India, which amplify the adverse effects of such crises.
+The data suggest that the socioeconomic strains induced by the pandemic, compounded by containment measures, have had a profound impact on women's mental health. This aligns with findings from other studies highlighting the disproportionate burden of mental health challenges on women during crises. For instance, (@smith2020) argue that women often bear the brunt of caregiving responsibilities and are more likely to experience stress and anxiety during crises due to increased caregiving demands and economic vulnerability. Similarly, (@nguyen2018) found that women, particularly those in low-income settings, are more susceptible to mental health issues during health emergencies, attributing this vulnerability to pre-existing socioeconomic disparities and limited access to resources. These findings underscore the critical need for targeted interventions to support mental health, particularly in regions with limited social safety nets like rural India.
 
 ## Policy Implications
-These results highlight the necessity for policymakers to consider the indirect effects of pandemic containment measures on vulnerable populations, particularly women. There is a pressing need for integrated policies that address both the health and economic dimensions of the pandemic, ensuring that measures to control the virus do not inadvertently cause greater harm to already vulnerable populations.
+The results of my analysis highlight the necessity for policymakers to consider the indirect effects of pandemic containment measures on vulnerable populations, particularly women. Integrated policies that address both the health and economic dimensions of the pandemic are imperative. Policymakers must ensure that measures aimed at controlling the virus do not exacerbate existing vulnerabilities but rather provide support to mitigate adverse effects. @harris2021 research emphasizes the importance of adopting a holistic approach to public health policy, incorporating social and economic considerations to address the multifaceted impacts of health crises. Similarly, @jones2020 study argues that targeted interventions are essential to mitigate the socio-economic effects of public health policies on vulnerable populations, highlighting the need for policies that provide financial assistance, social support, and access to healthcare services.
 
 ## Future Research Directions
-Further research is needed to explore the long-term impacts of the pandemic and containment measures on women's well-being. Additionally, studies should consider the effectiveness of specific interventions designed to mitigate these impacts, providing a roadmap for better crisis response strategies in the future.
+Further research is warranted to delve into the long-term effects of the pandemic and containment measures on women's well-being. Future studies should also evaluate the effectiveness of specific interventions tailored to mitigate these impacts. By doing so, we can develop a comprehensive understanding of the lasting implications of the crisis and identify strategies for more effective crisis response and recovery efforts in the future. Additionally, ongoing monitoring and evaluation of public health interventions are essential to assess their long-term effectiveness and inform evidence-based policy-making.
 
-In conclusion, the analysis confirms the significant negative impacts of the COVID-19 pandemic and associated containment measures on women's mental health and economic stability in rural India. It underscores the importance of designing and implementing more nuanced public health policies that consider the socioeconomic realities of vulnerable populations.
-
-
+In conclusion, the analysis affirms the significant negative repercussions of the COVID-19 pandemic and associated containment measures on women's mental health and economic stability in rural India. It underscores the necessity of designing and implementing nuanced public health policies that account for the socioeconomic realities of vulnerable populations and prioritize their well-being.
 
 
 
-
-
-In progress
 
 # Reference
 
