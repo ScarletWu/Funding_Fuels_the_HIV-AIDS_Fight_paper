@@ -13,7 +13,6 @@ data_file <- paste0(data_path, "covid_gender_data.dta")
 # Load the data
 data <- read_dta(data_file)
 
-# Identify all predictors including the ones starting with 'asset_'
 # Adding a unique call to prevent duplicate names
 predictors <- c("dist_prop_covid_zone", "geo_state", "fem_resp_age", "red_zone", "orange_zone", 
                 "cases_per_100000", "deaths_per_100000", "tran_inc_normal", "asset_index", 
@@ -32,27 +31,26 @@ data_filtered <- data %>%
 x_matrix <- model.matrix(~ . - 1, data = data_filtered[, predictors])
 y_vector <- data_filtered$ind_fem_worried_change
 
-# Lasso model fitting with cross-validation
+# Fit the LASSO model with cross-validation
 lasso_model <- cv.glmnet(x_matrix, y_vector, alpha = 1, family = "binomial")
 
-
+# Extract coefficients and the names of variables corresponding to non-zero coefficients
 coef_matrix <- as.matrix(coef(lasso_model, s = "lambda.min"))
+nonzero_indices <- which(coef_matrix != 0)  # Get indices of non-zero coefficients
+selected_vars <- colnames(x_matrix)[nonzero_indices - 1]  # Adjust for the intercept term, if present
 
-# Find the non-zero coefficients
-nonzero_coef <- coef_matrix[coef_matrix[, 1] != 0, , drop = FALSE]
+# Fit the logistic regression model using only the selected variables from the LASSO
+# Use the model.matrix directly since it contains the correct format of the predictors
+x_selected <- x_matrix[, nonzero_indices - 1]  # Exclude the intercept if it was included
+final_model <- glm(y_vector ~ x_selected - 1, family = binomial(), x = TRUE)
 
-# Extract the names of variables corresponding to non-zero coefficients
-selected_vars <- rownames(nonzero_coef)
+# Print the summary of the final model
+summary(final_model)
 
-# Print the selected variables
-print(selected_vars)
+# Optional: Tidy the model output and create outputs
+tidy_model <- broom::tidy(final_model)
+print(tidy_model)
 
-
-
-
-# Display coefficients with their values
-selected_coefficients <- nonzero_coef
-print(selected_coefficients)
 
 # Validation using a different subset or further cross-validation
 # For demonstration, we split the data into a training and test set

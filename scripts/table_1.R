@@ -96,6 +96,7 @@ fit_model <- function(response_variable) {
 # Run the models
 final_models <- lapply(set_names(response_vars), fit_model)
 
+print(final_models)
 # Assuming 'final_models' is a list of lists containing 'model' and 'robust_se' for each response variable
 
 # Prepare a data frame for stargazer
@@ -109,8 +110,7 @@ results <- data.frame(
   stringsAsFactors = FALSE
 )
 
-# Assuming you have a list of final model objects named 'final_models'
-# and that each element has a 'model' and 'robust_se' components.
+print(final_models)
 
 # Prepare the data for stargazer
 stargazer_data <- list()
