@@ -11,6 +11,7 @@ number-sections: true
 bibliography: references.bib
 ---
 
+
 # Introduction
 
 Public health funding significantly impacts public health outcomes, particularly during global health emergencies like the COVID-19 pandemic. In the study "Women’s well-being during a pandemic and its containment" published in the Journal of Development Economics (2022), the authors explore the dual crisis of disease and the containment policies designed to mitigate its spread, focusing specifically on their effects on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study.
@@ -37,6 +38,7 @@ Subsequent to data collection, the data were organized and analyzed using statis
 
 
 # Model
+
 
 
 ```{r}
@@ -100,7 +102,9 @@ for (response in response_vars) {
 
 ```
 
+
 # Results
+
 
 
 
@@ -113,7 +117,6 @@ data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs/"
 data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
 ```
-
 
 ```{r}
 #| label: fig-1
@@ -189,7 +192,6 @@ p1a
 coef_plot
 ```
 
-
 ```{r}
 # figure 2
 #| label: fig-2
@@ -254,6 +256,7 @@ for (var in outcome_vars) {
 
 
 ```
+
 The analysis reveals significant impacts of the COVID-19 pandemic on women's well-being in rural India. Specifically, moving from zero to average containment levels is associated with a 38% increase in the likelihood of women reporting more depression, a 73% increase in reporting more exhaustion, and a 44% increase in reporting more anxiety. These effects are further magnified among women with daughters and those living in female-headed households, underscoring the compounded vulnerabilities these groups face.
 
 ## Mental Health Deterioration
@@ -284,3 +287,4 @@ In conclusion, the analysis confirms the significant negative impacts of the COV
 In progress
 
 # Reference
+

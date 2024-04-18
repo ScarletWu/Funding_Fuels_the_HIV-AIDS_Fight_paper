@@ -8,9 +8,9 @@ library(tidyr)
 
 
 
-data_path <- "/cloud/project/data/raw_data/"
-data_file <- paste0(data_path, "covid_gender_data.dta")
-data <- read_dta(data_file)
+data_path <- "/cloud/project/data/cleaned/"
+data_file <- paste0(data_path, "Filtered_Covid_Gender_Data.csv")
+data <- read.csv(data_file)
 
 # Ensure factor variables are correctly formatted
 data <- mutate(data,
