@@ -37,6 +37,25 @@ Subsequent to data collection, the data were organized and analyzed using statis
 
 
 # Model
+Different models were used to evaluate diffrent factors to Indian women's well-being during the pandemic.
+
+We employ a regression model to assess the impact of district-level containment measures on individual outcomes, considering age, state, and district variables. Our outcome of interest reflects various personal experiences, with containment representing the intensity of policy measures in one's district.
+
+The model accounts for age and state as non-varying influences, along with controls for local COVID-19 severity and pre-pandemic socioeconomic factors to mitigate potential confounding effects. We ensure a consistent sample across studies by including only individuals with complete control data.
+
+$$
+y_{iasd} = \beta \text{containment}_d + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
+$$
+
+
+Additionally, we probe the robustness of our findings against possible biases in self-reported mental health changes by comparing them with general mental health inquiries that do not reference the pandemic timeframe.
+
+$$
+y_{iasd} = \beta_1 \text{has\_son}_i + \beta_2 \text{has\_daughter}_i + \beta_3 \text{female\_headed}_i + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
+$$
+
+
+In a related analysis, we explore how the presence of sons or daughters and female-headed households correlate with individual well-being, applying the same control variables and fixed effects as in the initial model.
 
 
 ```{r}

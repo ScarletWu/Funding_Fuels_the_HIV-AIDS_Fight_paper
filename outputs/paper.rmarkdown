@@ -38,6 +38,25 @@ Subsequent to data collection, the data were organized and analyzed using statis
 
 
 # Model
+Different models were used to evaluate diffrent factors to Indian women's well-being during the pandemic.
+
+We employ a regression model to assess the impact of district-level containment measures on individual outcomes, considering age, state, and district variables. Our outcome of interest reflects various personal experiences, with containment representing the intensity of policy measures in one's district.
+
+The model accounts for age and state as non-varying influences, along with controls for local COVID-19 severity and pre-pandemic socioeconomic factors to mitigate potential confounding effects. We ensure a consistent sample across studies by including only individuals with complete control data.
+
+$$
+y_{iasd} = \beta \text{containment}_d + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
+$$
+
+
+Additionally, we probe the robustness of our findings against possible biases in self-reported mental health changes by comparing them with general mental health inquiries that do not reference the pandemic timeframe.
+
+$$
+y_{iasd} = \beta_1 \text{has\_son}_i + \beta_2 \text{has\_daughter}_i + \beta_3 \text{female\_headed}_i + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
+$$
+
+
+In a related analysis, we explore how the presence of sons or daughters and female-headed households correlate with individual well-being, applying the same control variables and fixed effects as in the initial model.
 
 
 
@@ -192,6 +211,11 @@ p1a
 coef_plot
 ```
 
+@fig1-1 presents a histogram comparing the distribution of normal monthly income to income during the COVID-19 period, transformed using the inverse hyperbolic sine (IHS), which helps to linearize the data and deal with non-negative income values. The two distributions allow for a visual assessment of the shift in income levels due to the pandemic.
+
+@fig1-2 is a dot plot with error bars that showcase the proportion of households experiencing various outcomes due to the pandemic. These outcomes include lost income, reduced meals, and changes in mental health status such as increased depression, anxiety, exhaustion, and feelings of safety. Each point represents the mean value for the outcome, with the bars indicating the confidence intervals, providing a clear indication of the pandemic's impact on these factors.
+
+
 ```{r}
 # figure 2
 #| label: fig-2
@@ -256,6 +280,11 @@ for (var in outcome_vars) {
 
 
 ```
+
+
+@fig-2 are scatter plots that relate the containment measures to different outcomes, including anxiety, depression, exhaustion, lost income, reduced meals, and safety. The plots typically have the containment intensity on the x-axis and the outcome variable on the y-axis. The line represents the best-fit linear relationship between containment and the specific outcome. The slope coefficient (Beta) and its standard error (SE) are usually annotated on the plot, quantifying the association between containment policies and the outcomes, with higher values indicating a stronger relationship.
+
+
 
 The analysis reveals significant impacts of the COVID-19 pandemic on women's well-being in rural India. Specifically, moving from zero to average containment levels is associated with a 38% increase in the likelihood of women reporting more depression, a 73% increase in reporting more exhaustion, and a 44% increase in reporting more anxiety. These effects are further magnified among women with daughters and those living in female-headed households, underscoring the compounded vulnerabilities these groups face.
 
