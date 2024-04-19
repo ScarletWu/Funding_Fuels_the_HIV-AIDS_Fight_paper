@@ -46,24 +46,20 @@ Subsequent to data collection, the data were organized and analyzed using statis
 
 
 # Model
-Different models were used to evaluate diffrent factors to Indian women's well-being during the pandemic.
-
-I employ a regression model to assess the impact of district-level containment measures on individual outcomes, considering age, state, and district variables. Myoutcome of interest reflects various personal experiences, with containment representing the intensity of policy measures in one's district.
-
-The model accounts for age and state as non-varying influences, along with controls for local COVID-19 severity and pre-pandemic socioeconomic factors to mitigate potential confounding effects. I ensure a consistent sample across studies by including only individuals with complete control data.
+Different models were used to evaluate diffrent factors to Indian women's well-being during the pandemic.I employ a regression model to assess the impact of district-level containment measures on individual outcomes, considering age, state, and district variables. Myoutcome of interest reflects various personal experiences, with containment representing the intensity of policy measures in one's district. The model accounts for age and state as non-varying influences, along with controls for local COVID-19 severity and pre-pandemic socioeconomic factors to mitigate potential confounding effects. I ensure a consistent sample across studies by including only individuals with complete control data.
 
 $$
 y_{iasd} = \beta \text{containment}_d + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
 $$
 
-### Model Variables:
+## Model Variables:
 
-- `$y_{iasd}$`: The outcome variable for an individual, such as mental health or economic status.
-- `$\beta \text{containment}_d$`: Coefficient for containment policies in the individual's district, measuring the impact of these policies on the outcome.
-- `$\alpha_a$`: Age fixed effects to control for age-related variations in the outcome.
-- `$\delta_s$`: State fixed effects to account for differences attributable to the state of residence.
-- `$\Gamma X_i$`: Effects of control variables, including indicators for the district being in a red or orange zone during specific lockdown periods.
-- `$\epsilon_{iasd}$`: Error term capturing unobserved influences on the outcome.
+- $y_{iasd}$: The outcome variable for an individual, such as mental health or economic status.
+- $\beta \text{containment}_d$: Coefficient for containment policies in the individual's district, measuring the impact of these policies on the outcome.
+- $\alpha_a$: Age fixed effects to control for age-related variations in the outcome.
+- $\delta_s$: State fixed effects to account for differences attributable to the state of residence.
+- $\Gamma X_i$: Effects of control variables, including indicators for the district being in a red or orange zone during specific lockdown periods.
+- $\epsilon_{iasd}$: Error term capturing unobserved influences on the outcome.
 
 
 
@@ -255,6 +251,8 @@ Figure 2 illustrates scatter plots that relate the containment measures to diffe
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-width: 8 
+#| fig-height: 4 
 #| fig-subcap: ["Effect Sizes of Predictors in Mental Health Models", "Effect Sizes of Predictors in Economic and Nutritional Impact Models"]
 
 # Set the data path and read the data
@@ -375,7 +373,7 @@ plot_coefficients_logistic <- function(results) {
     labs(x = "Predictors", y = "Estimated Coefficients") +
     theme_minimal() +
     theme(legend.title = element_blank(),
-          legend.position = "bottom")
+          legend.position = "right")
 }
 
 plot_coefficients_felm <- function(results) {
@@ -386,7 +384,7 @@ plot_coefficients_felm <- function(results) {
     labs(x = "Predictors", y = "Estimated Coefficients") +
     theme_minimal() +
     theme(legend.title = element_blank(),
-          legend.position = "bottom")
+          legend.position = "right")
 }
 
 # Generate and display plots
@@ -398,6 +396,7 @@ results_felm <- summarize_models(results_vars_interest)
 plot_felm <- plot_coefficients_felm(results_felm)
 print(plot_felm)
 ```
+
 I conducted an analysis that focused on key predictor variables, such as the number of COVID-19 cases and deaths per 100,000, the proportion of districts in designated COVID zones, and the different containment zone statuses like Red and Orange Zones. I aimed to find connections between these predictors and the mental health outcomes among women during the pandemic, focusing on changes in depression, tiredness, and safety concerns.
 
 To refine my models, I utilized logistic regression techniques, which incorporated LASSO for variable selection. This approach was crucial in determining the strength and significance of relationships between the pandemic's containment measures and various mental health indicators. The results I uncovered were consistent with those of the original paper, indicating that containment measures such as lockdowns and restricted movements were associated with heightened feelings of depression and anxiety among women.The stricter containment measures correlate with poorer mental health and economic stability.
