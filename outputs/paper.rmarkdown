@@ -57,6 +57,14 @@ $$
 y_{iasd} = \beta \text{containment}_d + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
 $$
 
+### Model Variables:
+
+- `$y_{iasd}$`: The outcome variable for an individual, such as mental health or economic status.
+- `$\beta \text{containment}_d$`: Coefficient for containment policies in the individual's district, measuring the impact of these policies on the outcome.
+- `$\alpha_a$`: Age fixed effects to control for age-related variations in the outcome.
+- `$\delta_s$`: State fixed effects to account for differences attributable to the state of residence.
+- `$\Gamma X_i$`: Effects of control variables, including indicators for the district being in a red or orange zone during specific lockdown periods.
+- `$\epsilon_{iasd}$`: Error term capturing unobserved influences on the outcome.
 
 
 
@@ -86,7 +94,6 @@ library(caret)
 
 
 # Results
-
 
 
 
@@ -402,7 +409,7 @@ print(plot_felm)
 
 I conducted an analysis that focused on key predictor variables, such as the number of COVID-19 cases and deaths per 100,000, the proportion of districts in designated COVID zones, and the different containment zone statuses like Red and Orange Zones. I aimed to find connections between these predictors and the mental health outcomes among women during the pandemic, focusing on changes in depression, tiredness, and safety concerns.
 
-To refine my models, I utilized logistic regression techniques, which incorporated LASSO for variable selection. This approach was crucial in determining the strength and significance of relationships between the pandemic's containment measures and various mental health indicators. The results I uncovered were consistent with those of the original paper, indicating that containment measures such as lockdowns and restricted movements were associated with heightened feelings of depression and anxiety among women.
+To refine my models, I utilized logistic regression techniques, which incorporated LASSO for variable selection. This approach was crucial in determining the strength and significance of relationships between the pandemic's containment measures and various mental health indicators. The results I uncovered were consistent with those of the original paper, indicating that containment measures such as lockdowns and restricted movements were associated with heightened feelings of depression and anxiety among women.The stricter containment measures correlate with poorer mental health and economic stability.
 
 In @fig-3, I presented my findings through estimated coefficients that measure the statistical significance and magnitude of the impact each predictor has on mental health outcomes. For instance, residing in a district with a high COVID-19 death rate was significantly associated with an increased likelihood of reporting feelings of depression and tiredness. 
 
