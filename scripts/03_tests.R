@@ -3,6 +3,7 @@
 data_path <- "/cloud/project/data/cleaned/"
 data_file <- paste0(data_path, "Filtered_Covid_Gender_Data.csv")
 data <- read.csv(data_file)
+
 # Check for Missing Values
 test_missing_values <- any(is.na(data))
 
@@ -49,3 +50,23 @@ test_results <- list(
 
 # Output the results
 test_results
+
+# 1. Histogram of a numeric variable (e.g., cases_per_100000)
+ggplot(data, aes(x = cases_per_100000)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black') +
+  labs(title = "Distribution of COVID-19 Cases per 100,000", x = "Cases per 100,000", y = "Frequency")
+
+# 2. Boxplot for a categorical variable against a numeric variable 
+ggplot(data, aes(x = as.factor(geo_state), y = total_cases)) +
+  geom_boxplot() +
+  labs(title = "Total COVID-19 Cases by State", x = "State", y = "Total Cases")
+
+# 3 . Boxplot for a categorical variable against a numeric variable (e.g., economic status by state)
+ggplot(data, aes(x = as.factor(ind_fem_depression_change), y = total_cases)) +
+  geom_boxplot() +
+  labs(title = "More Depressed", x = "yes/no", y = "Total Cases")
+
+# 4. Scatter plot with two numerical variables (e.g., cases_per_100000 vs. deaths_per_100000)
+ggplot(data, aes(x = cases_per_100000, y = deaths_per_100000)) +
+  geom_point(aes(color = as.factor(geo_state))) +
+  labs(title = "COVID-19 Cases vs. Deaths per 100,000 by State", x = "Cases per 100,000", y = "Deaths per 100,000", color = "State")
