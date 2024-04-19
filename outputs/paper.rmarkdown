@@ -12,6 +12,7 @@ number-sections: true
 bibliography: references.bib
 ---
 
+
 # Introduction
 
 This paper critically examines the impact of COVID-19 containment policies on rural Indian women and focuses on their mental health and financial stability. The original study titled "Women's Well-being during a Pandemic and its Containment" from the Journal of Development Economics (2022) laid a foundation by exploring the broader effects of the pandemic on women in lower-income countries. This paper replicates and extends the research to delve deeper into the specific challenges faced by women in rural India, a demographic that remains underrepresented in global discussions on public health and economic policy (@bau2022).
@@ -61,6 +62,7 @@ $$
 
 
 
+
 ```{r}
 #| message: false
 #| include: false
@@ -82,7 +84,9 @@ library(caret)
 
 
 
+
 # Results
+
 
 
 
@@ -95,7 +99,6 @@ data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs/"
 data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
 ```
-
 
 ```{r}
 #| label: fig-1
@@ -172,9 +175,11 @@ coef_plot <- ggplot(model_summaries, aes(x = estimate, y = term, xmin = conf.low
 p1a
 coef_plot
 ```
+
 @fig-1-1 presents a histogram comparing the distribution of normal monthly income to income during the COVID-19 period, transformed using the inverse hyperbolic sine (IHS), which helps to linearize the data and deal with non-negative income values. The two distributions allow for a visual assessment of the shift in income levels due to the pandemic.
 
 @fig-1-2 is a dot plot with error bars that showcase the proportion of households experiencing various outcomes due to the pandemic. These outcomes include lost income, reduced meals, and changes in mental health status such as increased depression, anxiety, exhaustion, and feelings of safety. Each point represents the mean value for the outcome, with the bars indicating the confidence intervals, providing a clear indication of the pandemic's impact on these factors.
+
 
 ```{r}
 #| label: fig-2
@@ -239,7 +244,9 @@ for (var in outcome_vars) {
 
 ```
 
+
 Figure 2 illustrates scatter plots that relate the containment measures to different outcomes, including anxiety, depression, exhaustion, lost income, reduced meals, and safety. The plots have the containment intensity on the x-axis and the outcome variable on the y-axis. The line represents the best-fit linear relationship between containment and the specific outcome.  In these analyses, a regression coefficient (β) is used to measure the strength and direction of the relationship, accompanied by standard errors (SE) to indicate the precision of these estimates. As containment measures become more stringent , individuals report increasing levels of depression (β = 0.295, @fig-2-1), exhaustion (β = 0.504,  @fig-2-2), and anxiety (β = 0.332,  @fig-2-3), alongside a decreased sense of safety (β = 0.282, @fig-2-4). Additionally, there is a notable reduction in meal frequency (β = 1.15, @fig-2-5) and an increase in the loss of individual income (β = 0.065, @fig-2-6) associated with stricter containment policies. These β values are all positive, indicating a direct correlation with containment levels, and the SE values (in parentheses) reflect the variability of the estimates within the clusters of districts.
+
 
 
 
@@ -392,6 +399,7 @@ results_felm <- summarize_models(results_vars_interest)
 plot_felm <- plot_coefficients_felm(results_felm)
 print(plot_felm)
 ```
+
 I conducted an analysis that focused on key predictor variables, such as the number of COVID-19 cases and deaths per 100,000, the proportion of districts in designated COVID zones, and the different containment zone statuses like Red and Orange Zones. I aimed to find connections between these predictors and the mental health outcomes among women during the pandemic, focusing on changes in depression, tiredness, and safety concerns.
 
 To refine my models, I utilized logistic regression techniques, which incorporated LASSO for variable selection. This approach was crucial in determining the strength and significance of relationships between the pandemic's containment measures and various mental health indicators. The results I uncovered were consistent with those of the original paper, indicating that containment measures such as lockdowns and restricted movements were associated with heightened feelings of depression and anxiety among women.
@@ -421,3 +429,4 @@ Further research is warranted to delve into the long-term effects of the pandemi
 In conclusion, the analysis affirms the significant negative repercussions of the COVID-19 pandemic and associated containment measures on women's mental health and economic stability in rural India. The findings emphasize the pressing need for public health policies that are not only effective in controlling the spread of diseases but also considerate of the socioeconomic realities of the populations they impact. By taking these factors into account while making policies, we can strive to not only manage public health crises more efficiently but also reduce their harmful impacts on vulnerable populations.
 
 # Reference
+
