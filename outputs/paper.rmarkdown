@@ -101,7 +101,6 @@ library(caret)
 #| message: false
 #| include: false
 # Load data
-# Load data
 data_path <- "/cloud/project/data/raw_data/"
 output_path <- "/cloud/project/outputs/"
 data <- read_dta("/cloud/project/data/raw_data/covid_gender_data.dta")
@@ -331,8 +330,8 @@ summarize_models <- function(models) {
   bind_rows(
     lapply(names(models), function(model_name) {
       model_data <- tidy(models[[model_name]])
-      model_data$model <- rename_vars[model_name] %>% coalesce(model_name)  # Rename the model name
-      model_data$term <- rename_vars[model_data$term] %>% coalesce(model_data$term)  # Rename the terms
+      model_data$model <- rename_vars[model_name] %>% coalesce(model_name)  
+      model_data$term <- rename_vars[model_data$term] %>% coalesce(model_data$term)  
       return(model_data)
     }),
     .id = "model_id"
