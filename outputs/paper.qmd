@@ -1,10 +1,10 @@
 ---
 title: "Tracing Hidden Struggles of Rural Indian Women during Pandemic"
 author: Ruoxian Wu
-thanks: "Code and data are available at: https://github.com/ScarletWu/Tracing_Hidden_Struggles_of_Rural_Indian_Women_during_Pandemic.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/1783/"
+thanks: "Code and data are available at: https://github.com/ScarletWu/Tracing_Hidden_Struggles_of_Rural_Indian_Women_during_Pandemic.git. Replication on Social Science Reproduction platform is available at: https://www.socialsciencereproduction.org/reproductions/c37e126c-8a08-4a52-8f24-8c92a497fad5/index."
 date: "April 16, 2024"
 date-format: long
-abstract: "This paper replicates a pivotal study on the socio-economic impacts of pandemic containment policies on women in India, specifically examining mental health and food security. Utilizing a dataset spanning several indicators of economic and psychological health, this study employs a combination of linear and Lasso regression models to assess the implications of these measures. Key findings suggest significant correlations between containment intensity and various aspects of women's well-being, including mental health and economic stability. The results underscore the importance of considering gender-specific outcomes in policy-making processes, particularly in times of global crises. This study contributes to the broader discourse on public health interventions and their gendered impacts, advocating for more nuanced approaches in future public health strategies."
+abstract: "This paper replicates a pivotal study on the socio-economic impacts of pandemic containment policies on women in India, specifically examining mental health and financial status. Utilizing a dataset spanning several indicators of economic and psychological health, this study employs a combination of linear and Lasso regression models to assess the implications of these measures. Key findings suggest significant correlations between containment intensity and various aspects of women's well-being, including mental health and economic stability. The results underscore the importance of considering gender-specific outcomes in policy-making processes, particularly in times of global crises. This study contributes to the broader discourse on public health interventions and their gendered impacts, advocating for more nuanced approaches in future public health strategies."
 format: pdf
 toc: true
 number-sections: true
@@ -13,17 +13,21 @@ bibliography: references.bib
 
 # Introduction
 
-Public health funding significantly impacts public health outcomes, especially during global health emergencies like the COVID-19 pandemic. The study "Women’s Well-being during a Pandemic and its Containment," published in the Journal of Development Economics (2022), examines the effects of disease and containment policies on women in lower-income countries. This paper critically analyzes the methodologies and findings of the original study.
+The study "Women’s Well-being during a Pandemic and its Containment" from the Journal of Development Economics (2022) examines the effects of COVID-19 and related containment policies on women in lower-income countries @bau2022. My paper takes a close look at the original study's methodologies and outcomes. Using the data provided by the original authors, I replicated their research, applying fixed-effect analysis and regression models to assess how public health funding influences outcomes during health crises like COVID-19.
 
-I obtained the data from the original author to replicate the study. Using methodologies, including fixed-effect analysis and regression models, this paper evaluates the sensitivity of the findings to different analytical approaches. This critical analysis aims to clarify the complex relationships between public health funding, policy effectiveness, and their socio-economic effects. By re-examining the original study’s data and methodology, this paper contributes to understanding how public health initiatives can be optimized to serve vulnerable populations during crises.
+This analysis reviews the complex links between funding, policy effectiveness, and socio-economic impacts. It revisits the original study's data and approach, enhancing our understanding of how health initiatives can better serve vulnerable populations during emergencies.
+
+The original paper highlighted the decline in mental health, financial status, and meal nutrition for women due to pandemic policies (@bau2022). My work corroborates these findings and examines the balance needed between public health interventions and socio-economic support. Echoing findings from the World Health Organization (@who2020) and studies like that of @xie2021, my analysis confirms that strategic health investments are pivotal for crisis mitigation and socio-economic stability.
+
+This paper aims to inform policy that effectively utilizes health funding to improve outcomes and support those most affected by health crises, highlighting the need for policies that are responsive to the socio-economic realities of women in low-income countries during pandemics.
 
 # Data
 ## Tools
-My replication employed R [@r] along with several essential packages for data manipulation and visualization. Specifically, I utilized Haven [@haven] for importing and exporting data, Dplyr [@dplyr] for data manipulation, Ggplot2 [@ggplot2] for creating visualizations, Readr [@readr] for reading rectangular text data, Here [@here] for managing file paths, Janitor [@rJanitor] for examining and cleaning data, KableExtra [@kableExtra] for constructing complex tables, Knitr [@knitr] for dynamic report generation, and Tidyverse [@tidyverse] for a cohesive data science workflow. Additionally, I employed Coefplot [@coefplot] for visualizing regression coefficients and Broom [@broom], Lmtest [@lmtest], and Sandwich [@sandwich] for regression diagnostics and robust standard errors. For advanced modeling techniques, I utilized Glmnet [@glmnet] for Lasso regression.
+My replication employed R [@r] along with several essential packages for data manipulation and visualization. Specifically, I utilized Haven [@haven] for importing and exporting data, Dplyr [@dplyr] for data manipulation, Ggplot2 [@ggplot2] for creating visualizations, Readr [@readr] for reading rectangular text data, Here [@here] for managing file paths, Janitor [@janitor] for examining and cleaning data, KableExtra [@kableExtra] for constructing complex tables, Knitr [@knitr] for dynamic report generation, and Tidyverse [@tidyverse] for a cohesive data science workflow. Additionally, I employed Coefplot [@coefplot] for visualizing regression coefficients and Broom [@broom], Lmtest [@lmtest], and Sandwich [@sandwich] for regression diagnostics and robust standard errors. For advanced modeling techniques, I utilized Glmnet [@glmnet] for Lasso regression.
 
 ## Source
 
-This critical analysis utilizes replication data associated with the article "Women’s well-being during a pandemic and its containment" from the Journal of Development Economics. This data, along with associated code, was made accessible by the authors to facilitate the replication of key findings such as statistical models and graphical representations. By enabling the reproduction of the authors' analyses, this data contributes to the transparency and credibility of the study's conclusions. The replication package can be find and downloaded after requesting access.
+This critical analysis utilizes replication data associated with the article "Women’s well-being during a pandemic and its containment" from the Journal of Development Economics. The data, along with associated code, needs to be requested from 'https://datasets.iza.org/dataset/1395/g2lm-lic-women-s-well-being-during-a-pandemic-and-its-containment' to facilitate the replication of key findings such as statistical models and graphical representations. By enabling the reproduction of the authors' analyses, this data contributes to the transparency and credibility of the study's conclusions. The replication package can be find and downloaded after requesting access.
 
 ## Variables
 
@@ -46,14 +50,8 @@ y_{iasd} = \beta \text{containment}_d + \alpha_a + \delta_s + \Gamma X_i + \vare
 $$
 
 
-Additionally, I probe the robustness of my findings against possible biases in self-reported mental health changes by comparing them with general mental health inquiries that do not reference the pandemic timeframe.
-
-$$
-y_{iasd} = \beta_1 \text{has\_son}_i + \beta_2 \text{has\_daughter}_i + \beta_3 \text{female\_headed}_i + \alpha_a + \delta_s + \Gamma X_i + \varepsilon_{iasd},
-$$
 
 
-In a related analysis, I explore how the presence of sons or daughters and female-headed households correlate with individual well-being, applying the same control variables and fixed effects as in the initial model.
 
 
 ```{r}
@@ -393,6 +391,11 @@ results_felm <- summarize_models(results_vars_interest)
 plot_felm <- plot_coefficients_felm(results_felm)
 print(plot_felm)
 ```
+I conducted an analysis that focused on key predictor variables, such as the number of COVID-19 cases and deaths per 100,000, the proportion of districts in designated COVID zones, and the different containment zone statuses like Red and Orange Zones. I aimed to find connections between these predictors and the mental health outcomes among women during the pandemic, focusing on changes in depression, tiredness, and safety concerns.
+
+To refine my models, I utilized logistic regression techniques, which  incorporated LASSO for variable selection. This approach was crucial in determining the strength and significance of relationships between the pandemic's containment measures and various mental health indicators. The results I uncovered were consistent with those of the original paper, indicating that containment measures such as lockdowns and restricted movements were associated with heightened feelings of depression and anxiety among women.
+
+In @fig-3, I presented my findings through estimated coefficients that measure the statistical significance and magnitude of the impact each predictor has on mental health outcomes. For instance, residing in a district with a high COVID-19 death rate was significantly associated with an increased likelihood of reporting feelings of depression and tiredness. 
 
 
 ## Economic and Nutritional Impact
